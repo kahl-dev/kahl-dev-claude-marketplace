@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "kahl-dev-claude-marketplace",
+  "version": "1.0.0",
+  "description": "Claude Code plugins for home automation and productivity",
+  "owner": {
+    "name": "Patrick Kahl",
+    "email": "github@kahl.dev"
+  },
+  "plugins": [
+    {
+      "name": "homeassistant",
+      "description": "Home Assistant control and config deployment via Python scripts",
+      "source": "./plugins/homeassistant",
+      "keywords": ["homeassistant", "smarthome", "automation", "iot", "yaml"],
+      "license": "MIT"
+    }
+  ]
+}
