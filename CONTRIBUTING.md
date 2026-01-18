@@ -17,12 +17,22 @@ Thanks for your interest in contributing!
    cd kahl-dev-claude-marketplace
    ```
 
-2. Install locally:
-   ```bash
-   ./scripts/install-local.sh
+2. Add marketplace to Claude Code (directory source for development):
+   ```json
+   // ~/.claude/settings.local.json
+   {
+     "extraKnownMarketplaces": {
+       "kahl-dev-claude-marketplace": {
+         "source": {
+           "source": "directory",
+           "path": "${HOME}/path/to/kahl-dev-claude-marketplace"
+         }
+       }
+     }
+   }
    ```
 
-3. Make changes and test
+3. Restart Claude Code and test changes
 
 ## Code Style
 
@@ -72,35 +82,47 @@ if __name__ == "__main__":
 
 1. Create a feature branch:
    ```bash
-   git checkout -b feature/your-feature
+   git checkout -b feat/your-feature
    ```
 
 2. Make your changes
 
 3. Test locally with Claude Code
 
-4. Commit with clear message:
+4. Commit with conventional commit format:
    ```bash
-   git commit -m "✨ Add new feature X"
+   git commit -m "feat(homeassistant): add new feature X"
    ```
 
 5. Push and create PR:
    ```bash
-   git push origin feature/your-feature
+   git push origin feat/your-feature
    ```
 
 6. Describe your changes in the PR
 
-## Commit Message Conventions
+## Commit Conventions
 
-Use emoji prefixes:
-- ✨ New feature
-- 🐛 Bug fix
-- 📚 Documentation
-- 🔧 Configuration
-- 🎨 Code style/formatting
-- ♻️ Refactoring
-- 🔒 Security fix
+Use [Conventional Commits](https://conventionalcommits.org):
+
+| Type | Description |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `docs` | Documentation only |
+| `chore` | Maintenance, deps, config |
+| `refactor` | Code refactoring |
+| `test` | Adding tests |
+
+**Scopes:** `homeassistant`, `marketplace`, `docs`
+
+**Examples:**
+```
+feat(homeassistant): add climate control script
+fix(homeassistant): correct entity state parsing
+docs: update installation instructions
+chore(release): bump version to 1.1.0
+```
 
 ## Adding a New Plugin
 
@@ -126,7 +148,7 @@ Use emoji prefixes:
    }
    ```
 
-3. Update root README.md
+3. Update root README.md with new plugin entry
 
 ## Questions?
 
