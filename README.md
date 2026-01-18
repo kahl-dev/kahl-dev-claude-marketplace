@@ -1,129 +1,125 @@
-# 🚀 kahl-dev Claude Marketplace
+# kahl-dev Claude Marketplace
 
 Claude Code plugins for home automation and productivity.
 
-## 📦 Available Plugins
+## Available Plugins
 
 | Plugin | Description | Category |
 |--------|-------------|----------|
-| **[homeassistant](plugins/homeassistant/)** | Home Assistant control & config deployment | Smart Home |
+| [homeassistant](plugins/homeassistant/) | Home Assistant control & config deployment | Smart Home |
 
-## 🚀 Quick Start
+## Install
 
-### 1. Clone & Install
+Add the marketplace to Claude Code:
 
-```bash
-git clone https://github.com/kahl-dev/kahl-dev-claude-marketplace.git ~/repos/kahl-dev-claude-marketplace
-~/repos/kahl-dev-claude-marketplace/scripts/install-local.sh
+```
+/plugin marketplace add https://github.com/kahl-dev/kahl-dev-claude-marketplace
 ```
 
-### 2. Set Environment Variables
+Install the Home Assistant plugin:
+
+```
+/plugin install homeassistant
+```
+
+Or browse available plugins via the UI:
+
+```
+/plugin
+```
+
+Navigate to **Discover** tab and select plugins to install.
+
+## Configuration
+
+The Home Assistant plugin requires environment variables. Add to `~/.zshrc` or `~/.bashrc`:
 
 ```bash
-# In ~/.zshrc or ~/.bashrc
-
-# Home Assistant
+# Required - Home Assistant API access
 export HOMEASSISTANT_URL="http://homeassistant.local:8123"
 export HOMEASSISTANT_TOKEN="<your-long-lived-token>"
-export HA_SSH_HOST="<your-ssh-alias>"  # For config deployment
+
+# Required for config deployment
+export HA_SSH_HOST="<your-ssh-alias>"
+
+# Optional (has default)
+export HA_LOCAL_CONFIG="~/ha-config"
 ```
 
-### 3. Restart Claude Code
+Restart your shell or run `source ~/.zshrc`, then restart Claude Code.
+
+## Usage
+
+After installation, the `homeassistant` skill is available. Example commands:
 
 ```bash
-exit    # if in Claude
-claude  # fresh start
+# List entities
+uv run ~/.claude/plugins/kahl-dev-claude-marketplace/plugins/homeassistant/skills/homeassistant/scripts/list-entities.py --domain light
+
+# Deploy config changes
+uv run ~/.claude/plugins/kahl-dev-claude-marketplace/plugins/homeassistant/skills/homeassistant/scripts/deploy-config.py
 ```
 
-### 4. Verify
+See [plugins/homeassistant/README.md](plugins/homeassistant/README.md) for complete documentation.
+
+## Updating
+
+Update the marketplace via Claude Code:
 
 ```
-/plugin  # should show homeassistant@kahl-dev-claude-marketplace
+/plugin
 ```
 
-## 🔄 Updating
+Navigate to **Marketplaces** tab → select `kahl-dev-claude-marketplace` → **Update marketplace**.
 
-```bash
-cd ~/repos/kahl-dev-claude-marketplace && git pull
-```
-
-Changes take effect on next Claude Code restart.
-
-## 🔧 Troubleshooting
-
-### Skills not appearing?
-
-Run the symlink script:
-
-```bash
-~/repos/kahl-dev-claude-marketplace/scripts/symlink-skills.sh --local
-```
-
-### Plugin not working?
-
-1. Check env vars are set: `echo $HOMEASSISTANT_URL`
-2. Restart Claude: `exit` then `claude`
-3. Check plugin enabled: `/plugin`
-
-## 📖 Architecture
+## Architecture
 
 This marketplace uses the **Beyond MCP** pattern:
 
-- **90%+ context savings** vs traditional MCP servers
+- **90%+ context savings** compared to traditional MCP servers
 - Self-contained Python scripts with UV inline dependencies
-- Progressive disclosure (SKILL.md guides → scripts)
+- Progressive disclosure (SKILL.md guides Claude to scripts)
 - No background processes or servers
 
 See [docs/beyond-mcp.md](docs/beyond-mcp.md) for details.
 
-## ⚠️ Known Claude Code Bugs
-
-Skills from non-GitHub marketplaces need symlinks due to path resolution bugs:
-
-| Bug | Issue | Workaround |
-|-----|-------|------------|
-| Skills wrong path | [#10113](https://github.com/anthropics/claude-code/issues/10113) | Symlinks in `~/.claude/skills/` |
-| Commands not discovered | [#14929](https://github.com/anthropics/claude-code/issues/14929) | Symlinks in `~/.claude/commands/` |
-
-The install script handles these automatically.
-
-## 📂 Structure
+## Structure
 
 ```
 kahl-dev-claude-marketplace/
 ├── .claude-plugin/
-│   └── marketplace.json    # Marketplace definition
+│   └── marketplace.json
 ├── plugins/
-│   └── homeassistant/      # Home Assistant plugin
-│       ├── skills/
-│       │   └── homeassistant/
-│       │       ├── SKILL.md
-│       │       └── scripts/  # 22 Python scripts
+│   └── homeassistant/
+│       ├── skills/homeassistant/
+│       │   ├── SKILL.md
+│       │   └── scripts/
 │       ├── docs/
 │       └── README.md
-├── scripts/
-│   ├── install-local.sh    # One-line installer
-│   └── symlink-skills.sh   # Symlink workaround
 ├── docs/
-│   └── beyond-mcp.md       # Architecture docs
-└── README.md
+│   └── beyond-mcp.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+└── SECURITY.md
 ```
 
-## 🤝 Contributing
+## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## 🔒 Security
+## Security
 
 See [SECURITY.md](SECURITY.md) for:
+
 - Required token scopes
 - SSH security considerations
 - Threat model
 
-## 📝 License
+## License
 
 MIT - See [LICENSE](LICENSE)
 
-## 👤 Author
+## Author
 
 Patrick Kahl ([@kahl-dev](https://github.com/kahl-dev))
