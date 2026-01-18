@@ -78,8 +78,10 @@ I'll respond within 48 hours and work on a fix.
 
 ## Security Updates
 
-Security fixes will be released as soon as possible. Watch the repository for updates:
+Security fixes will be released as soon as possible. Update via Claude Code:
 
-```bash
-cd ~/repos/kahl-dev-claude-marketplace && git pull
 ```
+/plugin
+```
+
+Navigate to **Marketplaces** → `kahl-dev-claude-marketplace` → **Update marketplace**.

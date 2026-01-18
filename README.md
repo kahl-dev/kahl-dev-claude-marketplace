@@ -2,6 +2,8 @@
 
 Claude Code plugins for home automation and productivity.
 
+> **⚠️ Use at your own risk.** This software can modify your Home Assistant configuration. Always maintain backups. See [LICENSE](LICENSE) for warranty disclaimer.
+
 ## Available Plugins
 
 | Plugin | Description | Category |
