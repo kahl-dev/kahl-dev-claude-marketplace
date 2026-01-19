@@ -80,19 +80,27 @@ HAYAMLLoader.add_constructor("!secret", _secret_constructor)
 HAYAMLLoader.add_constructor("!env_var", _env_var_constructor)
 
 
-def get_required_env(name: str) -> str:
-    """Get required environment variable or fail fast with clear error."""
+def get_required_env(name: str, help_text: str = "") -> str:
+    """Get required environment variable or fail fast."""
     value = os.getenv(name)
     if not value:
-        click.echo(f"❌ Error: {name} environment variable is required but not set.", err=True)
-        click.echo(f'   Set it with: export {name}="<your-value>"', err=True)
+        click.echo(f"❌ Error: {name} not set.", err=True)
+        if help_text:
+            click.echo(f"   {help_text}", err=True)
+        click.echo(f'   Set: export {name}="<value>"', err=True)
         sys.exit(1)
     return value
 
 
 # Configuration from environment
-HA_URL = os.getenv("HOMEASSISTANT_URL")
-HA_TOKEN = os.getenv("HOMEASSISTANT_TOKEN")
+HA_URL = get_required_env(
+    "HOMEASSISTANT_URL",
+    "Your HA instance URL, e.g., http://homeassistant.local:8123",
+)
+HA_TOKEN = get_required_env(
+    "HOMEASSISTANT_TOKEN",
+    "Get from: HA → Profile → Security → Long-Lived Access Tokens",
+)
 HA_STAGING_PATH = os.getenv("HA_STAGING_PATH", "/homeassistant/config_staging")
 HA_CONFIG_PATH = os.getenv("HA_CONFIG_PATH", "/homeassistant")
 DEFAULT_LOCAL_PATH = os.path.expanduser(os.getenv("HA_LOCAL_CONFIG", "~/ha-config"))
@@ -124,9 +132,6 @@ class HomeAssistantClient:
     """HTTP client for Home Assistant API operations"""
 
     def __init__(self) -> None:
-        if not all([HA_URL, HA_TOKEN]):
-            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
-
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
             headers={
@@ -469,7 +474,10 @@ def main(
         uv run deploy-config.py --json
     """
     # Fail fast if HA_SSH_HOST not set
-    ssh_host = get_required_env("HA_SSH_HOST")
+    ssh_host = get_required_env(
+        "HA_SSH_HOST",
+        "SSH host for HA, e.g., root@homeassistant.local",
+    )
 
     steps: dict[str, Any] = {}
     config_path = Path(local_path).expanduser()

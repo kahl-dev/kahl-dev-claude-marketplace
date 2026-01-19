@@ -25,9 +25,28 @@ from typing import Any
 import click
 import httpx
 
+
+def get_required_env(name: str, help_text: str = "") -> str:
+    """Get required environment variable or fail fast."""
+    value = os.getenv(name)
+    if not value:
+        click.echo(f"❌ Error: {name} not set.", err=True)
+        if help_text:
+            click.echo(f"   {help_text}", err=True)
+        click.echo(f'   Set: export {name}="<value>"', err=True)
+        sys.exit(1)
+    return value
+
+
 # Configuration from environment
-HA_URL = os.getenv("HOMEASSISTANT_URL")
-HA_TOKEN = os.getenv("HOMEASSISTANT_TOKEN")
+HA_URL = get_required_env(
+    "HOMEASSISTANT_URL",
+    "Your HA instance URL, e.g., http://homeassistant.local:8123",
+)
+HA_TOKEN = get_required_env(
+    "HOMEASSISTANT_TOKEN",
+    "Get from: HA → Profile → Security → Long-Lived Access Tokens",
+)
 API_TIMEOUT = 30.0
 USER_AGENT = "HomeAssistant-CLI/1.0"
 
@@ -36,9 +55,6 @@ class HomeAssistantClient:
     """Minimal HTTP client for Home Assistant REST API - dashboards"""
 
     def __init__(self) -> None:
-        if not all([HA_URL, HA_TOKEN]):
-            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
-
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
             headers={

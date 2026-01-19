@@ -1,0 +1,5 @@
+{
+  "name": "homeassistant",
+  "version": "1.0.2",
+  "description": "Home Assistant control and config deployment via Python scripts"
+}

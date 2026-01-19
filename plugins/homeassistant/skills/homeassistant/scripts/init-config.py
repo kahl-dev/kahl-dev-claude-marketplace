@@ -24,6 +24,7 @@ Usage:
     uv run init-config.py --help
 """
 
+import json
 import os
 import shutil
 import subprocess
@@ -33,12 +34,14 @@ from pathlib import Path
 import click
 
 
-def get_required_env(name: str) -> str:
-    """Get required environment variable or fail fast with clear error."""
+def get_required_env(name: str, help_text: str = "") -> str:
+    """Get required environment variable or fail fast."""
     value = os.getenv(name)
     if not value:
-        click.echo(f"❌ Error: {name} environment variable is required but not set.", err=True)
-        click.echo(f'   Set it with: export {name}="<your-value>"', err=True)
+        click.echo(f"❌ Error: {name} not set.", err=True)
+        if help_text:
+            click.echo(f"   {help_text}", err=True)
+        click.echo(f'   Set: export {name}="<value>"', err=True)
         sys.exit(1)
     return value
 
@@ -229,10 +232,17 @@ def count_files(local_path: Path) -> int:
     is_flag=True,
     help="Skip pulling config from HA (just create structure)",
 )
+@click.option(
+    "--json",
+    "output_json",
+    is_flag=True,
+    help="Output JSON instead of human-readable text",
+)
 def main(
     path: str,
     force: bool,
     skip_pull: bool,
+    output_json: bool,
 ) -> None:
     """
     Bootstrap local Home Assistant config repository.
@@ -254,119 +264,145 @@ def main(
         uv run init-config.py --force
 
         uv run init-config.py --skip-pull
+
+        uv run init-config.py --json
     """
     local_path = Path(path).expanduser()
 
-    click.echo("")
-    click.echo("=" * 70)
-    click.echo("🏠 Home Assistant Config Bootstrap")
-    click.echo("=" * 70)
-    click.echo("")
+    def log(message: str) -> None:
+        """Print message only in human mode."""
+        if not output_json:
+            click.echo(message)
+
+    def error_exit(message: str, code: int = 1) -> None:
+        """Exit with error message."""
+        if output_json:
+            click.echo(json.dumps({"success": False, "error": message}))
+        else:
+            click.echo(f"❌ {message}", err=True)
+        sys.exit(code)
+
+    log("")
+    log("=" * 70)
+    log("🏠 Home Assistant Config Bootstrap")
+    log("=" * 70)
+    log("")
 
     # Step 1: Get required env var
-    click.echo("📋 Checking environment...")
-    ssh_host = get_required_env("HA_SSH_HOST")
-    click.echo(f"   HA_SSH_HOST: {ssh_host}")
-    click.echo("")
+    log("📋 Checking environment...")
+    ssh_host = os.getenv("HA_SSH_HOST")
+    if not ssh_host:
+        error_exit('HA_SSH_HOST not set. Set: export HA_SSH_HOST="user@hostname"')
+    log(f"   HA_SSH_HOST: {ssh_host}")
+    log("")
 
     # Step 2: Check if directory exists
     if local_path.exists():
         if not force:
-            click.echo(f"❌ Directory already exists: {local_path}")
-            click.echo("   Use --force to overwrite (DANGEROUS)")
-            sys.exit(1)
+            error_exit(f"Directory already exists: {local_path}. Use --force to overwrite.")
         else:
-            click.echo(f"⚠️  Removing existing directory: {local_path}")
+            log(f"⚠️  Removing existing directory: {local_path}")
             shutil.rmtree(local_path)
 
     # Step 3: Check SSH connection
-    click.echo("🔐 Checking SSH connection...")
+    log("🔐 Checking SSH connection...")
     if not check_ssh_connection(ssh_host):
-        click.echo(f"❌ Cannot connect to {ssh_host}")
-        click.echo("   Ensure SSH is configured and keys are set up:")
-        click.echo(f"   ssh {ssh_host}")
-        sys.exit(1)
-    click.echo(f"   ✅ Connected to {ssh_host}")
-    click.echo("")
+        error_exit(f"Cannot connect to {ssh_host}. Ensure SSH is configured.")
+    log(f"   ✅ Connected to {ssh_host}")
+    log("")
 
     # Step 4: Check HA config exists
-    click.echo("📁 Checking HA config directory...")
+    log("📁 Checking HA config directory...")
     if not check_ha_config_exists(ssh_host):
-        click.echo(f"❌ HA config not found at {HA_CONFIG_PATH}")
-        click.echo("   Check HA_CONFIG_PATH environment variable")
-        sys.exit(1)
-    click.echo(f"   ✅ Found config at {HA_CONFIG_PATH}")
-    click.echo("")
+        error_exit(f"HA config not found at {HA_CONFIG_PATH}")
+    log(f"   ✅ Found config at {HA_CONFIG_PATH}")
+    log("")
 
     # Step 5: Create local directory
-    click.echo(f"📂 Creating directory: {local_path}")
+    log(f"📂 Creating directory: {local_path}")
     local_path.mkdir(parents=True, exist_ok=True)
-    click.echo("   ✅ Created")
-    click.echo("")
+    log("   ✅ Created")
+    log("")
 
     # Step 6: Create .gitignore
-    click.echo("📝 Creating .gitignore...")
+    log("📝 Creating .gitignore...")
     gitignore_path = local_path / ".gitignore"
     gitignore_path.write_text(GITIGNORE_CONTENT)
-    click.echo("   ✅ Created")
-    click.echo("")
+    log("   ✅ Created")
+    log("")
 
     # Step 7: Pull config from HA
+    file_count = 0
     if not skip_pull:
-        click.echo("📥 Pulling config from HA (this may take a while)...")
+        log("📥 Pulling config from HA (this may take a while)...")
         success, output = pull_config(local_path, ssh_host)
         if not success:
-            click.echo(f"❌ Failed to pull config: {output}")
-            sys.exit(1)
+            error_exit(f"Failed to pull config: {output}")
 
         file_count = count_files(local_path)
-        click.echo(f"   ✅ Pulled {file_count} YAML files")
-        click.echo("")
+        log(f"   ✅ Pulled {file_count} YAML files")
+        log("")
     else:
-        click.echo("⏭️  Skipping config pull (--skip-pull)")
-        click.echo("")
+        log("⏭️  Skipping config pull (--skip-pull)")
+        log("")
 
     # Step 8: Create staging directory on HA
-    click.echo("📁 Creating staging directory on HA...")
-    if create_staging_dir(ssh_host):
-        click.echo(f"   ✅ Created {HA_STAGING_PATH}")
+    log("📁 Creating staging directory on HA...")
+    staging_created = create_staging_dir(ssh_host)
+    if staging_created:
+        log(f"   ✅ Created {HA_STAGING_PATH}")
     else:
-        click.echo("   ⚠️  Could not create staging dir (may already exist)")
-    click.echo("")
+        log("   ⚠️  Could not create staging dir (may already exist)")
+    log("")
 
     # Step 9: Initialize git
-    click.echo("🔧 Initializing git repository...")
+    log("🔧 Initializing git repository...")
     if not init_git_repo(local_path):
-        click.echo("❌ Failed to initialize git")
-        sys.exit(1)
-    click.echo("   ✅ Initialized")
-    click.echo("")
+        error_exit("Failed to initialize git")
+    log("   ✅ Initialized")
+    log("")
 
     # Step 10: Create initial commit
-    click.echo("💾 Creating initial commit...")
-    if create_initial_commit(local_path):
-        click.echo("   ✅ Committed")
+    log("💾 Creating initial commit...")
+    commit_created = create_initial_commit(local_path)
+    if commit_created:
+        log("   ✅ Committed")
     else:
-        click.echo("   ⚠️  No files to commit or commit failed")
-    click.echo("")
+        log("   ⚠️  No files to commit or commit failed")
+    log("")
 
     # Success!
-    click.echo("=" * 70)
-    click.echo("✅ BOOTSTRAP COMPLETE!")
-    click.echo("=" * 70)
-    click.echo("")
-    click.echo(f"📂 Config location: {local_path}")
-    click.echo("")
-    click.echo("🔧 Add to ~/.zshrc (if not already set):")
-    click.echo("")
-    click.echo(f'   export HA_LOCAL_CONFIG="{local_path}"')
-    click.echo("")
-    click.echo("📋 Next steps:")
-    click.echo("   1. Edit YAML files in the local directory")
-    click.echo("   2. Validate: uv run validate-config.py")
-    click.echo("   3. Deploy:   uv run deploy-config.py")
-    click.echo("   4. Commit changes with git")
-    click.echo("")
+    if output_json:
+        click.echo(
+            json.dumps(
+                {
+                    "success": True,
+                    "path": str(local_path),
+                    "ssh_host": ssh_host,
+                    "files_pulled": file_count,
+                    "skipped_pull": skip_pull,
+                    "git_initialized": True,
+                    "initial_commit": commit_created,
+                }
+            )
+        )
+    else:
+        click.echo("=" * 70)
+        click.echo("✅ BOOTSTRAP COMPLETE!")
+        click.echo("=" * 70)
+        click.echo("")
+        click.echo(f"📂 Config location: {local_path}")
+        click.echo("")
+        click.echo("🔧 Add to ~/.zshrc (if not already set):")
+        click.echo("")
+        click.echo(f'   export HA_LOCAL_CONFIG="{local_path}"')
+        click.echo("")
+        click.echo("📋 Next steps:")
+        click.echo("   1. Edit YAML files in the local directory")
+        click.echo("   2. Validate: uv run validate-config.py")
+        click.echo("   3. Deploy:   uv run deploy-config.py")
+        click.echo("   4. Commit changes with git")
+        click.echo("")
 
 
 if __name__ == "__main__":

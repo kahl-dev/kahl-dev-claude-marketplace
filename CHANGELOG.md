@@ -17,6 +17,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLAUDE.md: Enhanced `get_required_env()` pattern with help_text
 - CLAUDE.md: Versioning matrix table
 - CLAUDE.md: Contributing workflow + skip hooks tip
+- Plugin structure: Add `.claude-plugin/plugin.json` to homeassistant plugin
+
+## homeassistant [1.0.2] - 2026-01-19
+
+### Changed
+
+- All 20 API scripts now use `get_required_env()` with help_text for better error messages
+- `init-config.py` now supports `--json` flag for dual output
+
+### Fixed
+
+- Environment variable errors now show WHERE to get values (e.g., "Get from: HA → Profile → Security")
+
+## homeassistant [1.0.1] - 2025-01-19
+
+### Fixed
+
+- Rewrite `create-automation.py` to match script pattern:
+  - Add `--json` flag for dual output support
+  - Add `HomeAssistantClient` class with context manager
+  - Add proper type hints throughout
+  - Remove default `HOMEASSISTANT_URL` (fail-fast pattern)
 
 ## [1.0.0] - 2025-01-18
 
