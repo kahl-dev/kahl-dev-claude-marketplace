@@ -38,9 +38,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -69,13 +67,9 @@ class HomeAssistantClient:
             response = self.client.get("/states")
             response.raise_for_status()
             all_states = response.json()
-            return [
-                s for s in all_states if s.get("entity_id", "").startswith("scene.")
-            ]
+            return [s for s in all_states if s.get("entity_id", "").startswith("scene.")]
         except httpx.HTTPStatusError as error:
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -149,8 +143,7 @@ def main(search: str | None, output_json: bool) -> None:
                 s
                 for s in scenes
                 if search_lower in s.get("entity_id", "").lower()
-                or search_lower
-                in s.get("attributes", {}).get("friendly_name", "").lower()
+                or search_lower in s.get("attributes", {}).get("friendly_name", "").lower()
             ]
 
         if output_json:

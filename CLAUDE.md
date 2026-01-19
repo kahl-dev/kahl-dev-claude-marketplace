@@ -14,7 +14,26 @@ plugins/
     └── docs/                      # User documentation
 ```
 
+## Development Setup
+
+```bash
+# Install dev dependencies (pre-commit, ruff)
+uv sync
+
+# Pre-commit hooks auto-install on first commit
+# Manual install: uv run pre-commit install
+```
+
 ## Commands
+
+### Linting
+
+```bash
+uv run ruff check .        # Lint all files
+uv run ruff check --fix .  # Auto-fix issues
+uv run ruff format .       # Format all files
+uv run pre-commit run --all-files  # Run all hooks
+```
 
 ### Testing Scripts
 
@@ -91,7 +110,9 @@ Version lives in `.claude-plugin/marketplace.json`.
 
 ## Commit Conventions
 
-Use [Conventional Commits](https://conventionalcommits.org):
+**Enforced by pre-commit hook** - commits rejected if format invalid.
+
+Format: `<type>(<scope>): <description>`
 
 ```
 feat(homeassistant): add new script for X
@@ -101,7 +122,10 @@ chore(release): bump version to 1.1.0
 refactor: simplify error handling
 ```
 
+**Types:** `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `perf`
 **Scopes:** `homeassistant`, `marketplace`, `docs`, or omit for root changes
+
+**On commit:** ruff auto-fixes + formats staged Python files
 
 ## Adding a New Plugin
 
@@ -140,4 +164,4 @@ refactor: simplify error handling
 - NEVER add personal data (hostnames, paths, IPs)
 - ALWAYS use `os.path.expanduser()` for paths with `~`
 - ALWAYS provide `--help` on all scripts
-- Test scripts compile before committing
+- Pre-commit hooks run automatically - no need to lint manually before commit

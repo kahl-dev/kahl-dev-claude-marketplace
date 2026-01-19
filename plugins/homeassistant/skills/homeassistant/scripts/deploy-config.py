@@ -46,6 +46,7 @@ import yaml
 # Custom YAML loader that handles Home Assistant's !include and similar tags
 class HAYAMLLoader(yaml.SafeLoader):
     """YAML loader with Home Assistant custom tags support"""
+
     pass
 
 
@@ -84,7 +85,7 @@ def get_required_env(name: str) -> str:
     value = os.getenv(name)
     if not value:
         click.echo(f"❌ Error: {name} environment variable is required but not set.", err=True)
-        click.echo(f"   Set it with: export {name}=\"<your-value>\"", err=True)
+        click.echo(f'   Set it with: export {name}="<your-value>"', err=True)
         sys.exit(1)
     return value
 
@@ -94,9 +95,7 @@ HA_URL = os.getenv("HOMEASSISTANT_URL")
 HA_TOKEN = os.getenv("HOMEASSISTANT_TOKEN")
 HA_STAGING_PATH = os.getenv("HA_STAGING_PATH", "/homeassistant/config_staging")
 HA_CONFIG_PATH = os.getenv("HA_CONFIG_PATH", "/homeassistant")
-DEFAULT_LOCAL_PATH = os.path.expanduser(
-    os.getenv("HA_LOCAL_CONFIG", "~/ha-config")
-)
+DEFAULT_LOCAL_PATH = os.path.expanduser(os.getenv("HA_LOCAL_CONFIG", "~/ha-config"))
 
 API_TIMEOUT = 120.0
 USER_AGENT = "HomeAssistant-CLI/1.0"
@@ -104,20 +103,20 @@ USER_AGENT = "HomeAssistant-CLI/1.0"
 # CRITICAL: Files/directories to NEVER overwrite
 # These contain device registries, Zigbee/Z-Wave networks, auth, etc.
 RSYNC_EXCLUDES = [
-    ".storage/",           # Device registries, entity registry, auth, Zigbee
-    "backups/",            # Backup files
-    "secrets.yaml",        # CRITICAL: Production secrets (never from git!)
-    "*.db",                # SQLite databases
-    "*.db-shm",            # SQLite WAL files
-    "*.db-wal",            # SQLite WAL files
-    "home-assistant.log*", # Log files
-    "*.log",               # Other logs
-    "tts/",                # Text-to-speech cache
-    "deps/",               # Python dependencies (managed by HA)
-    "__pycache__/",        # Python cache
-    ".cloud/",             # Cloud config
-    ".ha_run.lock",        # Lock file
-    ".HA_VERSION",         # Version file (HA manages)
+    ".storage/",  # Device registries, entity registry, auth, Zigbee
+    "backups/",  # Backup files
+    "secrets.yaml",  # CRITICAL: Production secrets (never from git!)
+    "*.db",  # SQLite databases
+    "*.db-shm",  # SQLite WAL files
+    "*.db-wal",  # SQLite WAL files
+    "home-assistant.log*",  # Log files
+    "*.log",  # Other logs
+    "tts/",  # Text-to-speech cache
+    "deps/",  # Python dependencies (managed by HA)
+    "__pycache__/",  # Python cache
+    ".cloud/",  # Cloud config
+    ".ha_run.lock",  # Lock file
+    ".HA_VERSION",  # Version file (HA manages)
 ]
 
 
@@ -126,9 +125,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -184,7 +181,7 @@ class HomeAssistantClient:
 def validate_yaml_file(filepath: Path) -> dict[str, Any]:
     """Validate a single YAML file"""
     try:
-        with open(filepath, "r") as file:
+        with open(filepath) as file:
             yaml.load(file, Loader=HAYAMLLoader)
         return {"file": filepath.name, "valid": True, "error": None}
     except yaml.YAMLError as error:
@@ -210,7 +207,9 @@ def validate_local_config(local_path: Path) -> tuple[bool, list[dict[str, Any]]]
 def rsync_to_staging(local_path: Path, ssh_host: str) -> dict[str, Any]:
     """Push local config to staging on HA"""
     rsync_command = [
-        "rsync", "-av", "--delete",
+        "rsync",
+        "-av",
+        "--delete",
         "--exclude=.git/",
         "--exclude=.gitignore",
         "--exclude=secrets.yaml",
@@ -227,7 +226,10 @@ def rsync_to_staging(local_path: Path, ssh_host: str) -> dict[str, Any]:
 
     try:
         process = subprocess.run(rsync_command, capture_output=True, text=True, timeout=120)
-        return {"success": process.returncode == 0, "error": process.stderr if process.returncode != 0 else None}
+        return {
+            "success": process.returncode == 0,
+            "error": process.stderr if process.returncode != 0 else None,
+        }
     except Exception as error:
         return {"success": False, "error": str(error)}
 
@@ -236,10 +238,7 @@ def copy_secrets_to_staging(ssh_host: str) -> dict[str, Any]:
     """Copy secrets from production to staging"""
     src = shlex.quote(f"{HA_CONFIG_PATH}/secrets.yaml")
     dst = shlex.quote(f"{HA_STAGING_PATH}/secrets.yaml")
-    ssh_command = [
-        "ssh", ssh_host,
-        f"cp {src} {dst} 2>/dev/null || true"
-    ]
+    ssh_command = ["ssh", ssh_host, f"cp {src} {dst} 2>/dev/null || true"]
     try:
         subprocess.run(ssh_command, capture_output=True, timeout=30)
         return {"success": True}

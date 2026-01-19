@@ -17,7 +17,13 @@ Thanks for your interest in contributing!
    cd kahl-dev-claude-marketplace
    ```
 
-2. Add marketplace to Claude Code (directory source for development):
+2. Install dev dependencies:
+   ```bash
+   uv sync
+   ```
+   This installs pre-commit hooks (ruff linting/formatting, conventional commits).
+
+3. Add marketplace to Claude Code (directory source for development):
    ```json
    // ~/.claude/settings.local.json
    {
@@ -32,7 +38,7 @@ Thanks for your interest in contributing!
    }
    ```
 
-3. Restart Claude Code and test changes
+4. Restart Claude Code and test changes
 
 ## Code Style
 
@@ -103,7 +109,7 @@ if __name__ == "__main__":
 
 ## Commit Conventions
 
-Use [Conventional Commits](https://conventionalcommits.org):
+Commits are validated by pre-commit hooks. Use [Conventional Commits](https://conventionalcommits.org):
 
 | Type | Description |
 |------|-------------|

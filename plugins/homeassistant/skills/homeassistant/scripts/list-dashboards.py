@@ -37,9 +37,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -72,9 +70,7 @@ class HomeAssistantClient:
             if error.response.status_code == 404:
                 # No custom dashboards, return empty with note about default
                 return []
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -116,9 +112,7 @@ def format_dashboards(dashboards: list[dict[str, Any]]) -> str:
         lines.append(f"   URL: /{url_path}")
         lines.append(f"   Mode: {mode}")
         lines.append(f"   Icon: {icon}")
-        lines.append(
-            f"   {sidebar_emoji} In Sidebar: {'Yes' if show_in_sidebar else 'No'}"
-        )
+        lines.append(f"   {sidebar_emoji} In Sidebar: {'Yes' if show_in_sidebar else 'No'}")
         lines.append("")
 
     return "\n".join(lines)

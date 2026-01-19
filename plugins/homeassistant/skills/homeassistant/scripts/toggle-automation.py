@@ -38,9 +38,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -72,9 +70,7 @@ class HomeAssistantClient:
         except httpx.HTTPStatusError as error:
             if error.response.status_code == 404:
                 raise Exception(f"Automation not found: {entity_id}") from error
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -92,9 +88,7 @@ class HomeAssistantClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as error:
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -119,12 +113,8 @@ def format_result(
     lines.append("")
     lines.append(f"📍 Entity: {entity_id}")
     lines.append(f"🎯 Action: {action}")
-    lines.append(
-        f"{before_emoji} Before: {'Enabled' if before_state == 'on' else 'Disabled'}"
-    )
-    lines.append(
-        f"{after_emoji} After: {'Enabled' if after_state == 'on' else 'Disabled'}"
-    )
+    lines.append(f"{before_emoji} Before: {'Enabled' if before_state == 'on' else 'Disabled'}")
+    lines.append(f"{after_emoji} After: {'Enabled' if after_state == 'on' else 'Disabled'}")
     lines.append("")
 
     return "\n".join(lines)
@@ -192,9 +182,7 @@ def main(entity_id: str, action: str, output_json: bool) -> None:
         if output_json:
             click.echo(json.dumps(result, indent=2))
         else:
-            formatted = format_result(
-                entity_id, action, before_state, after_state, friendly_name
-            )
+            formatted = format_result(entity_id, action, before_state, after_state, friendly_name)
             click.echo(formatted)
 
         sys.exit(0)

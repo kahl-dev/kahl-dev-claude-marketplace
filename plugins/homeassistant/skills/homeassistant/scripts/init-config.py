@@ -38,7 +38,7 @@ def get_required_env(name: str) -> str:
     value = os.getenv(name)
     if not value:
         click.echo(f"❌ Error: {name} environment variable is required but not set.", err=True)
-        click.echo(f"   Set it with: export {name}=\"<your-value>\"", err=True)
+        click.echo(f'   Set it with: export {name}="<your-value>"', err=True)
         sys.exit(1)
     return value
 
@@ -50,20 +50,20 @@ HA_STAGING_PATH = os.getenv("HA_STAGING_PATH", "/homeassistant/config_staging")
 
 # Files to exclude from rsync (never pull from HA)
 RSYNC_EXCLUDES = [
-    ".storage/",           # Device registries, entity registry, auth, Zigbee
-    "backups/",            # Backup files
-    "secrets.yaml",        # Production secrets
-    "*.db",                # SQLite databases
-    "*.db-shm",            # SQLite WAL files
-    "*.db-wal",            # SQLite WAL files
-    "home-assistant.log*", # Log files
-    "*.log",               # Other logs
-    "tts/",                # Text-to-speech cache
-    "deps/",               # Python dependencies
-    "__pycache__/",        # Python cache
-    ".cloud/",             # Cloud config
-    ".ha_run.lock",        # Lock file
-    ".HA_VERSION",         # Version file
+    ".storage/",  # Device registries, entity registry, auth, Zigbee
+    "backups/",  # Backup files
+    "secrets.yaml",  # Production secrets
+    "*.db",  # SQLite databases
+    "*.db-shm",  # SQLite WAL files
+    "*.db-wal",  # SQLite WAL files
+    "home-assistant.log*",  # Log files
+    "*.log",  # Other logs
+    "tts/",  # Text-to-speech cache
+    "deps/",  # Python dependencies
+    "__pycache__/",  # Python cache
+    ".cloud/",  # Cloud config
+    ".ha_run.lock",  # Lock file
+    ".HA_VERSION",  # Version file
 ]
 
 # .gitignore content
@@ -331,7 +331,7 @@ def main(
     if create_staging_dir(ssh_host):
         click.echo(f"   ✅ Created {HA_STAGING_PATH}")
     else:
-        click.echo(f"   ⚠️  Could not create staging dir (may already exist)")
+        click.echo("   ⚠️  Could not create staging dir (may already exist)")
     click.echo("")
 
     # Step 9: Initialize git

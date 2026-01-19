@@ -21,7 +21,7 @@ Usage:
 import json
 import os
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import click
@@ -39,9 +39,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -90,9 +88,7 @@ class HomeAssistantClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as error:
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -231,24 +227,20 @@ def main(
             try:
                 start_time = datetime.fromisoformat(start)
                 if start_time.tzinfo is None:
-                    start_time = start_time.replace(tzinfo=timezone.utc)
+                    start_time = start_time.replace(tzinfo=UTC)
             except ValueError as error:
-                raise click.UsageError(
-                    f"Invalid start time format: {start}. Use ISO format."
-                ) from error
+                raise click.UsageError(f"Invalid start time format: {start}. Use ISO format.") from error
         else:
-            start_time = datetime.now(timezone.utc) - timedelta(hours=hours)
+            start_time = datetime.now(UTC) - timedelta(hours=hours)
 
         end_time: datetime | None = None
         if end:
             try:
                 end_time = datetime.fromisoformat(end)
                 if end_time.tzinfo is None:
-                    end_time = end_time.replace(tzinfo=timezone.utc)
+                    end_time = end_time.replace(tzinfo=UTC)
             except ValueError as error:
-                raise click.UsageError(
-                    f"Invalid end time format: {end}. Use ISO format."
-                ) from error
+                raise click.UsageError(f"Invalid end time format: {end}. Use ISO format.") from error
 
         with HomeAssistantClient() as client:
             result = client.get_history(entity_id, start_time, end_time)

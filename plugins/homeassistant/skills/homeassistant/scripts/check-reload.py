@@ -38,7 +38,7 @@ def get_required_env(name: str) -> str:
     value = os.getenv(name)
     if not value:
         click.echo(f"❌ Error: {name} environment variable is required but not set.", err=True)
-        click.echo(f"   Set it with: export {name}=\"<your-value>\"", err=True)
+        click.echo(f'   Set it with: export {name}="<your-value>"', err=True)
         sys.exit(1)
     return value
 
@@ -55,9 +55,7 @@ class HomeAssistantClient:
 
     def __init__(self, timeout: float = DEFAULT_TIMEOUT) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.timeout = timeout
         self.client = httpx.Client(
@@ -105,7 +103,7 @@ class HomeAssistantClient:
             response = self.client.get("/states")
             response.raise_for_status()
             return response.json()
-        except Exception as error:
+        except Exception:
             return []
 
     def get_error_log(self) -> str:
@@ -259,11 +257,7 @@ def format_check_result(
     lines.append("")
     lines.append("-" * 80)
 
-    overall_ok = (
-        api_check.get("running", False)
-        and core_check.get("success", False)
-        and len(recent_errors) == 0
-    )
+    overall_ok = api_check.get("running", False) and core_check.get("success", False) and len(recent_errors) == 0
 
     if overall_ok:
         lines.append("✅ RELOAD SUCCESSFUL - Home Assistant is healthy")
@@ -339,10 +333,7 @@ def main(
 
         core_check = run_ha_core_check(ssh_host, timeout=timeout)
 
-        overall_success = (
-            api_check.get("running", False)
-            and core_check.get("success", False)
-        )
+        overall_success = api_check.get("running", False) and core_check.get("success", False)
 
         if output_json:
             result = {

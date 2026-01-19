@@ -38,9 +38,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -72,9 +70,7 @@ class HomeAssistantClient:
         except httpx.HTTPStatusError as error:
             if error.response.status_code == 404:
                 raise Exception(f"Entity not found: {entity_id}") from error
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -93,9 +89,7 @@ class HomeAssistantClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as error:
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -109,12 +103,8 @@ def format_toggle_result(
     """Format toggle result for human-readable output"""
     lines: list[str] = []
 
-    before_emoji = (
-        "🟢" if before_state == "on" else "🔴" if before_state == "off" else "⚪"
-    )
-    after_emoji = (
-        "🟢" if after_state == "on" else "🔴" if after_state == "off" else "⚪"
-    )
+    before_emoji = "🟢" if before_state == "on" else "🔴" if before_state == "off" else "⚪"
+    after_emoji = "🟢" if after_state == "on" else "🔴" if after_state == "off" else "⚪"
 
     lines.append("")
     lines.append("=" * 80)
@@ -158,9 +148,7 @@ def main(entity_id: str, action: str | None, output_json: bool) -> None:
     try:
         # Determine domain from entity_id
         if "." not in entity_id:
-            raise click.UsageError(
-                f"Invalid entity_id format: {entity_id}. Expected format: domain.name"
-            )
+            raise click.UsageError(f"Invalid entity_id format: {entity_id}. Expected format: domain.name")
 
         domain = entity_id.split(".")[0]
 
@@ -181,10 +169,7 @@ def main(entity_id: str, action: str | None, output_json: bool) -> None:
         ]
 
         if domain not in toggle_domains:
-            raise click.UsageError(
-                f"Domain '{domain}' may not support toggle. "
-                f"Supported: {', '.join(toggle_domains)}"
-            )
+            raise click.UsageError(f"Domain '{domain}' may not support toggle. Supported: {', '.join(toggle_domains)}")
 
         with HomeAssistantClient() as client:
             # Get current state
@@ -222,9 +207,7 @@ def main(entity_id: str, action: str | None, output_json: bool) -> None:
         if output_json:
             click.echo(json.dumps(result, indent=2))
         else:
-            formatted = format_toggle_result(
-                entity_id, action, before_state, after_state
-            )
+            formatted = format_toggle_result(entity_id, action, before_state, after_state)
             click.echo(formatted)
 
         sys.exit(0)

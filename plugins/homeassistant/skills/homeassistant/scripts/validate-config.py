@@ -40,6 +40,7 @@ import yaml
 # Custom YAML loader that handles Home Assistant's !include and similar tags
 class HAYAMLLoader(yaml.SafeLoader):
     """YAML loader with Home Assistant custom tags support"""
+
     pass
 
 
@@ -78,7 +79,7 @@ def get_required_env(name: str) -> str:
     value = os.getenv(name)
     if not value:
         click.echo(f"❌ Error: {name} environment variable is required but not set.", err=True)
-        click.echo(f"   Set it with: export {name}=\"<your-value>\"", err=True)
+        click.echo(f'   Set it with: export {name}="<your-value>"', err=True)
         sys.exit(1)
     return value
 
@@ -86,9 +87,7 @@ def get_required_env(name: str) -> str:
 # Configuration from environment
 HA_STAGING_PATH = os.getenv("HA_STAGING_PATH", "/homeassistant/config_staging")
 HA_CONFIG_PATH = os.getenv("HA_CONFIG_PATH", "/homeassistant")
-DEFAULT_LOCAL_PATH = os.path.expanduser(
-    os.getenv("HA_LOCAL_CONFIG", "~/ha-config")
-)
+DEFAULT_LOCAL_PATH = os.path.expanduser(os.getenv("HA_LOCAL_CONFIG", "~/ha-config"))
 
 
 def validate_yaml_file(filepath: Path) -> dict[str, Any]:
@@ -101,7 +100,7 @@ def validate_yaml_file(filepath: Path) -> dict[str, Any]:
     }
 
     try:
-        with open(filepath, "r") as file:
+        with open(filepath) as file:
             yaml.load(file, Loader=HAYAMLLoader)
         result["valid"] = True
     except yaml.YAMLError as error:
@@ -165,7 +164,11 @@ def rsync_to_staging(local_path: Path, ssh_host: str) -> dict[str, Any]:
         if process.returncode == 0:
             result["success"] = True
             lines = process.stdout.strip().split("\n")
-            file_lines = [line for line in lines if not line.startswith("sending") and not line.startswith("sent") and not line.startswith("total")]
+            file_lines = [
+                line
+                for line in lines
+                if not line.startswith("sending") and not line.startswith("sent") and not line.startswith("total")
+            ]
             result["files_transferred"] = len([line for line in file_lines if line.strip() and not line.endswith("/")])
             result["output"] = process.stdout
         else:
@@ -192,7 +195,7 @@ def copy_secrets_to_staging(ssh_host: str) -> dict[str, Any]:
     ssh_command = [
         "ssh",
         ssh_host,
-        f"cp {src} {dst} 2>/dev/null || echo 'No secrets.yaml found (OK if not using secrets)'"
+        f"cp {src} {dst} 2>/dev/null || echo 'No secrets.yaml found (OK if not using secrets)'",
     ]
 
     try:
@@ -358,10 +361,7 @@ def main(
                 secrets_result = copy_secrets_to_staging(ssh_host)
 
         # Determine overall success
-        overall_valid = (
-            len(yaml_errors) == 0
-            and (skip_push or rsync_result["success"])
-        )
+        overall_valid = len(yaml_errors) == 0 and (skip_push or rsync_result["success"])
 
         if output_json:
             result = {

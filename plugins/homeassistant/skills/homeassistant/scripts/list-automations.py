@@ -39,9 +39,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -70,15 +68,9 @@ class HomeAssistantClient:
             response = self.client.get("/states")
             response.raise_for_status()
             all_states = response.json()
-            return [
-                s
-                for s in all_states
-                if s.get("entity_id", "").startswith("automation.")
-            ]
+            return [s for s in all_states if s.get("entity_id", "").startswith("automation.")]
         except httpx.HTTPStatusError as error:
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -101,9 +93,7 @@ def format_automations(automations: list[dict[str, Any]]) -> str:
     enabled_count = sum(1 for a in automations if a.get("state") == "on")
     disabled_count = len(automations) - enabled_count
 
-    lines.append(
-        f"Total: {len(automations)} ({enabled_count} enabled, {disabled_count} disabled)"
-    )
+    lines.append(f"Total: {len(automations)} ({enabled_count} enabled, {disabled_count} disabled)")
     lines.append("")
     lines.append("-" * 80)
 
@@ -186,8 +176,7 @@ def main(
                 a
                 for a in automations
                 if search_lower in a.get("entity_id", "").lower()
-                or search_lower
-                in a.get("attributes", {}).get("friendly_name", "").lower()
+                or search_lower in a.get("attributes", {}).get("friendly_name", "").lower()
             ]
 
         if output_json:

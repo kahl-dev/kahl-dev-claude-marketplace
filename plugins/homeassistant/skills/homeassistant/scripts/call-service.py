@@ -38,9 +38,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -83,9 +81,7 @@ class HomeAssistantClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as error:
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -96,9 +92,7 @@ class HomeAssistantClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as error:
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -246,9 +240,7 @@ def main(
                     try:
                         service_data = json.loads(data)
                     except json.JSONDecodeError as error:
-                        raise click.UsageError(
-                            f"Invalid JSON in --data: {error}"
-                        ) from error
+                        raise click.UsageError(f"Invalid JSON in --data: {error}") from error
 
                 result = client.call_service(domain, service, entity, service_data)
 

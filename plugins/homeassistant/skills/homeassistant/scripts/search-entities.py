@@ -39,9 +39,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -71,9 +69,7 @@ class HomeAssistantClient:
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as error:
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
@@ -220,9 +216,7 @@ def main(
 
         # Domain filter
         if domain:
-            filtered = [
-                e for e in filtered if e.get("entity_id", "").startswith(f"{domain}.")
-            ]
+            filtered = [e for e in filtered if e.get("entity_id", "").startswith(f"{domain}.")]
 
         # Pattern filter
         if pattern:
@@ -230,9 +224,7 @@ def main(
             for entity in filtered:
                 entity_id = entity.get("entity_id", "")
                 friendly_name = entity.get("attributes", {}).get("friendly_name", "")
-                if matches_pattern(entity_id, pattern, regex) or matches_pattern(
-                    friendly_name, pattern, regex
-                ):
+                if matches_pattern(entity_id, pattern, regex) or matches_pattern(friendly_name, pattern, regex):
                     new_filtered.append(entity)
             filtered = new_filtered
 
@@ -245,11 +237,7 @@ def main(
             if "=" not in attr_filter:
                 continue
             key, value = attr_filter.split("=", 1)
-            filtered = [
-                e
-                for e in filtered
-                if str(e.get("attributes", {}).get(key, "")) == value
-            ]
+            filtered = [e for e in filtered if str(e.get("attributes", {}).get(key, "")) == value]
 
         # Apply limit
         filtered = filtered[:limit]

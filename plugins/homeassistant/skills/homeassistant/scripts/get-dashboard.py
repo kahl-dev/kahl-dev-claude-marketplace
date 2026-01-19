@@ -39,9 +39,7 @@ class HomeAssistantClient:
 
     def __init__(self) -> None:
         if not all([HA_URL, HA_TOKEN]):
-            raise ValueError(
-                "Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN"
-            )
+            raise ValueError("Missing environment variables: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN")
 
         self.client = httpx.Client(
             base_url=f"{HA_URL}/api",
@@ -77,19 +75,13 @@ class HomeAssistantClient:
             return response.json()
         except httpx.HTTPStatusError as error:
             if error.response.status_code == 404:
-                raise Exception(
-                    f"Dashboard not found: {url_path or 'lovelace'}"
-                ) from error
-            raise Exception(
-                f"API error: {error.response.status_code} - {error.response.text}"
-            ) from error
+                raise Exception(f"Dashboard not found: {url_path or 'lovelace'}") from error
+            raise Exception(f"API error: {error.response.status_code} - {error.response.text}") from error
         except httpx.RequestError as error:
             raise Exception(f"Network error: {error}") from error
 
 
-def format_dashboard(
-    config: dict[str, Any], url_path: str, view_index: int | None
-) -> str:
+def format_dashboard(config: dict[str, Any], url_path: str, view_index: int | None) -> str:
     """Format dashboard config for human-readable output"""
     lines: list[str] = []
 
@@ -108,9 +100,7 @@ def format_dashboard(
     if view_index is not None:
         # Show specific view
         if view_index >= len(views):
-            lines.append(
-                f"❌ View {view_index} not found. Dashboard has {len(views)} views."
-            )
+            lines.append(f"❌ View {view_index} not found. Dashboard has {len(views)} views.")
         else:
             view = views[view_index]
             view_title = view.get("title", f"View {view_index}")
@@ -202,9 +192,7 @@ def main(url_path: str, view: int | None, output_json: bool) -> None:
                 if view < len(views):
                     click.echo(json.dumps(views[view], indent=2))
                 else:
-                    click.echo(
-                        json.dumps({"error": f"View {view} not found"}, indent=2)
-                    )
+                    click.echo(json.dumps({"error": f"View {view} not found"}, indent=2))
             else:
                 click.echo(json.dumps(config, indent=2))
         else:
