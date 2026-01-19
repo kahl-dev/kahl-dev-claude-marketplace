@@ -7,12 +7,22 @@
 - **Home Assistant 2024.x+** (tested with 2025.x)
 - **SSH access** (for config deployment features)
 
-## Step 1: Install the Marketplace
+## Step 1: Install the Plugin
 
-```bash
-git clone https://github.com/kahl-dev/kahl-dev-claude-marketplace.git ~/repos/kahl-dev-claude-marketplace
-~/repos/kahl-dev-claude-marketplace/scripts/install-local.sh
+In Claude Code, add the marketplace and install the plugin:
+
 ```
+/plugin marketplace add https://github.com/kahl-dev/kahl-dev-claude-marketplace
+/plugin install homeassistant
+```
+
+Or browse available plugins via the UI:
+
+```
+/plugin
+```
+
+Navigate to **Discover** tab and select `homeassistant` to install.
 
 ## Step 2: Create Home Assistant Token
 
@@ -74,11 +84,19 @@ If you want to deploy config changes, see [SSH Setup](ssh-setup.md).
 
 ### "Skill not found"
 
-Run the symlink script:
+Reinstall the plugin:
 
-```bash
-~/repos/kahl-dev-claude-marketplace/scripts/symlink-skills.sh --local
 ```
+/plugin install homeassistant
+```
+
+Or check that the marketplace is properly added:
+
+```
+/plugin
+```
+
+Navigate to **Marketplaces** tab to verify `kahl-dev-claude-marketplace` is listed.
 
 ### "Connection refused"
 
