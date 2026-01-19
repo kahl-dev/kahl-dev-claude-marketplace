@@ -56,10 +56,10 @@ After installation, the `homeassistant` skill is available. Example commands:
 
 ```bash
 # List entities
-uv run ~/.claude/plugins/kahl-dev-claude-marketplace/plugins/homeassistant/skills/homeassistant/scripts/list-entities.py --domain light
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/list-entities.py --domain light
 
 # Deploy config changes
-uv run ~/.claude/plugins/kahl-dev-claude-marketplace/plugins/homeassistant/skills/homeassistant/scripts/deploy-config.py
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/deploy-config.py
 ```
 
 See [plugins/homeassistant/README.md](plugins/homeassistant/README.md) for complete documentation.

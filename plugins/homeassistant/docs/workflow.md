@@ -34,7 +34,7 @@ This guide explains the complete workflow for editing and deploying Home Assista
 ### 1. Bootstrap (One-Time)
 
 ```bash
-uv run ~/.claude/skills/homeassistant/scripts/init-config.py
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/init-config.py
 ```
 
 This:
@@ -59,7 +59,7 @@ vim ~/ha-config/configuration.yaml
 ### 3. Validate
 
 ```bash
-uv run ~/.claude/skills/homeassistant/scripts/validate-config.py
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/validate-config.py
 ```
 
 This:
@@ -72,7 +72,7 @@ This:
 ### 4. Deploy
 
 ```bash
-uv run ~/.claude/skills/homeassistant/scripts/deploy-config.py
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/deploy-config.py
 ```
 
 This:
@@ -85,7 +85,7 @@ This:
 ### 5. Verify
 
 ```bash
-uv run ~/.claude/skills/homeassistant/scripts/check-reload.py
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/check-reload.py
 ```
 
 Check that HA is healthy and no errors appeared.
@@ -103,7 +103,7 @@ git commit -m "Add bedroom automation"
 Preview what would be deployed without making changes:
 
 ```bash
-uv run ~/.claude/skills/homeassistant/scripts/deploy-config.py --dry-run
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/deploy-config.py --dry-run
 ```
 
 ## Skip Backup
@@ -111,7 +111,7 @@ uv run ~/.claude/skills/homeassistant/scripts/deploy-config.py --dry-run
 For quick iterations (not recommended for production):
 
 ```bash
-uv run ~/.claude/skills/homeassistant/scripts/deploy-config.py --no-backup
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/deploy-config.py --no-backup
 ```
 
 ## Protected Files
@@ -134,7 +134,7 @@ If you made changes directly in HA (via UI):
 
 ```bash
 # Pull changes to staging
-uv run ~/.claude/skills/homeassistant/scripts/validate-config.py
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/validate-config.py
 
 # Then manually rsync staging to local
 rsync -av $HA_SSH_HOST:$HA_STAGING_PATH/ ~/ha-config/

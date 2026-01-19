@@ -130,5 +130,5 @@ ssh ha "mkdir -p ~/.homeassistant_staging"
 Or use the init script which creates it automatically:
 
 ```bash
-uv run ~/.claude/skills/homeassistant/scripts/init-config.py
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/init-config.py
 ```

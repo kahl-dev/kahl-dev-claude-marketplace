@@ -29,7 +29,7 @@ export HA_SSH_HOST="<your-ssh-alias>"
 If you want to deploy config changes:
 
 ```bash
-uv run ~/.claude/skills/homeassistant/scripts/init-config.py
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/init-config.py
 ```
 
 ### 3. Use in Claude Code

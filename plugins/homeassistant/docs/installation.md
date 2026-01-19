@@ -73,7 +73,7 @@ In Claude, ask:
 Or run directly:
 
 ```bash
-uv run ~/.claude/skills/homeassistant/scripts/get-config.py
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/get-config.py
 ```
 
 ## Step 5: SSH Setup (Optional)
