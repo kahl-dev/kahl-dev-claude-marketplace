@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Makefile with LIA conventions (ASCII art, ##N help system, color output)
+- Version bump script (`scripts/bump-version.sh`)
+- Enhanced ruff config: `C4` rule, per-file ignores for UV scripts (`E402`, `E501`)
+- `docs/contributing.md` guide
+- CLAUDE.md: Path references section (`${CLAUDE_PLUGIN_ROOT}` convention)
+- CLAUDE.md: Enhanced `get_required_env()` pattern with help_text
+- CLAUDE.md: Versioning matrix table
+- CLAUDE.md: Contributing workflow + skip hooks tip
+
 ## [1.0.0] - 2025-01-18
 
 ### Added
