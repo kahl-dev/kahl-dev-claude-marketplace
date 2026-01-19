@@ -32,3 +32,6 @@ Thumbs.db
 # Local testing
 test-output/
 *.log
+
+# Plans (local development only)
+specs/
