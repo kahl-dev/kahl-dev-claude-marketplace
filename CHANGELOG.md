@@ -19,6 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLAUDE.md: Contributing workflow + skip hooks tip
 - Plugin structure: Add `.claude-plugin/plugin.json` to homeassistant plugin
 
+## homeassistant [1.0.3] - 2026-01-21
+
+### Fixed
+
+- SKILL.md: Use correct model identifier `haiku` instead of `claude-haiku-4-5`
+- Docs: Fix marketplace install command format (use `owner/repo` not full URL)
+
 ## homeassistant [1.0.2] - 2026-01-19
 
 ### Changed
