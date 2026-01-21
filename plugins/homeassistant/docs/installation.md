@@ -12,8 +12,8 @@
 In Claude Code, add the marketplace and install the plugin:
 
 ```
-/plugin marketplace add https://github.com/kahl-dev/kahl-dev-claude-marketplace
-/plugin install homeassistant
+/plugin marketplace add kahl-dev/kahl-dev-claude-marketplace
+/plugin install homeassistant@kahl-dev-claude-marketplace
 ```
 
 Or browse available plugins via the UI:

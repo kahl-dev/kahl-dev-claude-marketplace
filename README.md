@@ -15,13 +15,13 @@ Claude Code plugins for home automation and productivity.
 Add the marketplace to Claude Code:
 
 ```
-/plugin marketplace add https://github.com/kahl-dev/kahl-dev-claude-marketplace
+/plugin marketplace add kahl-dev/kahl-dev-claude-marketplace
 ```
 
 Install the Home Assistant plugin:
 
 ```
-/plugin install homeassistant
+/plugin install homeassistant@kahl-dev-claude-marketplace
 ```
 
 Or browse available plugins via the UI:
