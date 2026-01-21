@@ -2,7 +2,7 @@
 name: homeassistant
 description: |
   [Claude Code ONLY] Home Assistant control via scripts in ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/.
-  Auto-triggers on: homeassistant, hass, light, switch, sensor, automation, scene, toggle, turn on/off, dashboard, deploy config, validate config, backup.
+  Auto-triggers on: homeassistant, hass, light, switch, sensor, automation, scene, toggle, turn on/off, dashboard, deploy config, validate config, backup, system log, repairs, health check, diagnostics.
   Read SKILL.md guide to know which script for your task. Use --help for syntax (don't read script sources).
   Scripts provide entity control, automations, scenes, scripts, dashboards, history, AND config file deployment.
   Requires env vars: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN, HA_SSH_HOST (for deploy). Always use absolute paths.
@@ -100,6 +100,17 @@ export HA_STAGING_PATH="/homeassistant/config_staging"  # Default
 | `trigger-backup.py` | Create HA backup | `--no-wait` |
 | `check-reload.py` | Verify HA health | `--wait 10` |
 
+### Diagnostic Operations
+
+| Script | Use When | Example |
+|--------|----------|---------|
+| `get-system-log.py` | View HA errors/warnings | `--level error --limit 10` |
+| `list-repairs.py` | Check Spook repair issues | `--severity warning` |
+| `check-config.py` | Validate HA configuration | (no args) |
+| `automation-health.py` | Find automation issues | `--check-entities --stale-days 30` |
+
+**Note:** `get-system-log.py` and `list-repairs.py` use WebSocket API (undocumented, verified on HA 2026.1.2).
+
 ## Config Deployment Workflow
 
 **Edit → Validate → Deploy → Verify**
@@ -152,7 +163,8 @@ All scripts: `${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/`
 - 2 dashboard operations
 - 1 system operation
 - 5 config operations
-- **Total: 22 scripts**
+- 4 diagnostic operations
+- **Total: 26 scripts**
 
 ## Dual Output Pattern
 

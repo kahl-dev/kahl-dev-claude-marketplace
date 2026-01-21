@@ -100,15 +100,18 @@ def get_websocket_url(base_url: str) -> str:
     """Convert HTTP(S) URL to WebSocket URL using proper parsing."""
     parsed = urlparse(base_url)
     ws_scheme = "wss" if parsed.scheme == "https" else "ws"
-    return urlunparse(parsed._replace(scheme=ws_scheme, path="/api/websocket"))
+    # Preserve existing path and append /api/websocket
+    base_path = parsed.path.rstrip("/")
+    ws_path = f"{base_path}/api/websocket"
+    return urlunparse(parsed._replace(scheme=ws_scheme, path=ws_path))
 
 
 def get_automation_config(automation_id: str) -> dict[str, Any] | None:
     """Get automation config via WebSocket API."""
     ws_url = get_websocket_url(HA_URL)
-
-    ws = create_connection(ws_url, timeout=WS_TIMEOUT)
+    ws = None
     try:
+        ws = create_connection(ws_url, timeout=WS_TIMEOUT)
         # Auth phase
         ws.recv()  # auth_required
         ws.send(json.dumps({"type": "auth", "access_token": HA_TOKEN}))
@@ -128,7 +131,8 @@ def get_automation_config(automation_id: str) -> dict[str, Any] | None:
     except (WebSocketTimeoutException, Exception):
         return None
     finally:
-        ws.close()
+        if ws:
+            ws.close()
 
 
 def extract_entity_references(config: dict[str, Any]) -> set[str]:
@@ -220,12 +224,17 @@ def analyze_automations(
         # Check: Stale (not triggered recently)
         if last_triggered:
             try:
-                triggered_dt = datetime.fromisoformat(last_triggered.replace("Z", "+00:00"))
+                # Handle both "Z" suffix and explicit timezone offsets
+                timestamp_str = last_triggered.replace("Z", "+00:00")
+                triggered_dt = datetime.fromisoformat(timestamp_str)
+                # Ensure timezone-aware (handle naive datetimes)
+                if triggered_dt.tzinfo is None:
+                    triggered_dt = triggered_dt.replace(tzinfo=UTC)
                 days_since = (now - triggered_dt).days
                 if days_since > stale_days:
                     automation_issues.append(f"stale ({days_since} days)")
                     stale_count += 1
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, AttributeError):
                 pass
         elif state == "on":
             # Enabled but never triggered

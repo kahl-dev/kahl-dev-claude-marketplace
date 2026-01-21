@@ -59,15 +59,18 @@ def get_websocket_url(base_url: str) -> str:
     """Convert HTTP(S) URL to WebSocket URL using proper parsing."""
     parsed = urlparse(base_url)
     ws_scheme = "wss" if parsed.scheme == "https" else "ws"
-    return urlunparse(parsed._replace(scheme=ws_scheme, path="/api/websocket"))
+    # Preserve existing path and append /api/websocket
+    base_path = parsed.path.rstrip("/")
+    ws_path = f"{base_path}/api/websocket"
+    return urlunparse(parsed._replace(scheme=ws_scheme, path=ws_path))
 
 
 def websocket_command(command_type: str) -> dict[str, Any]:
     """Execute WebSocket command and return result."""
     ws_url = get_websocket_url(HA_URL)
-
-    ws = create_connection(ws_url, timeout=WS_TIMEOUT)
+    ws = None
     try:
+        ws = create_connection(ws_url, timeout=WS_TIMEOUT)
         # Auth phase
         ws.recv()  # auth_required
         ws.send(json.dumps({"type": "auth", "access_token": HA_TOKEN}))
@@ -91,23 +94,13 @@ def websocket_command(command_type: str) -> dict[str, Any]:
     except WebSocketTimeoutException as error:
         raise Exception(f"WebSocket timeout after {WS_TIMEOUT}s") from error
     finally:
-        ws.close()
+        if ws:
+            ws.close()
 
 
-def format_log_entries(entries: list[dict[str, Any]], level: str | None, limit: int | None) -> str:
+def format_log_entries(entries: list[dict[str, Any]]) -> str:
     """Format log entries for human-readable output."""
     lines: list[str] = []
-
-    # Filter by level if specified
-    if level:
-        entries = [e for e in entries if e.get("level", "").lower() == level.lower()]
-
-    # Sort by timestamp descending (newest first)
-    entries = sorted(entries, key=lambda x: x.get("timestamp", 0), reverse=True)
-
-    # Apply limit
-    if limit:
-        entries = entries[:limit]
 
     if not entries:
         return "No log entries found."
@@ -218,7 +211,7 @@ def main(
         if output_json:
             click.echo(json.dumps(filtered, indent=2))
         else:
-            formatted = format_log_entries(entries, level, limit)
+            formatted = format_log_entries(filtered)
             click.echo(formatted)
 
         sys.exit(0)

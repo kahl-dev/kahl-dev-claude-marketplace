@@ -19,6 +19,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLAUDE.md: Contributing workflow + skip hooks tip
 - Plugin structure: Add `.claude-plugin/plugin.json` to homeassistant plugin
 
+## homeassistant [1.1.0] - 2026-01-21
+
+### Added
+
+- **Diagnostic scripts** (4 new scripts, 22 → 26 total):
+  - `get-system-log.py`: Query HA system logs via WebSocket API
+  - `list-repairs.py`: Query Spook repair issues via WebSocket API
+  - `check-config.py`: Validate HA configuration via REST API
+  - `automation-health.py`: Analyze automations for issues (disabled, stale, unknown entities)
+- SKILL.md: New "Diagnostic Operations" section with script reference table
+- SKILL.md: Updated triggers to include diagnostic keywords
+
+### Changed
+
+- WebSocket scripts use `urllib.parse` for robust URL handling (supports proxied HA instances)
+- WebSocket cleanup improved (handles connection failures gracefully)
+
+### Technical
+
+- Uses `websocket-client` (sync) library - matches existing httpx pattern
+- WebSocket endpoints used: `system_log/list`, `repairs/list_issues`, `automation/config`
+- Note: These are undocumented HA APIs, verified on HA 2026.1.2
+
 ## homeassistant [1.0.3] - 2026-01-21
 
 ### Fixed
