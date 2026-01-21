@@ -6,7 +6,7 @@ description: |
   Read SKILL.md guide to know which script for your task. Use --help for syntax (don't read script sources).
   Scripts provide entity control, automations, scenes, scripts, dashboards, history, AND config file deployment.
   Requires env vars: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN, HA_SSH_HOST (for deploy). Always use absolute paths.
-model: claude-haiku-4-5
+model: haiku
 ---
 
 # Home Assistant Scripts Skill
