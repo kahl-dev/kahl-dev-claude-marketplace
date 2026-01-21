@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLAUDE.md: Contributing workflow + skip hooks tip
 - Plugin structure: Add `.claude-plugin/plugin.json` to homeassistant plugin
 
+### Fixed
+
+- `automation-health.py`: Exit 0 on successful run (finding issues is expected behavior, not failure)
+
 ## homeassistant [1.1.0] - 2026-01-21
 
 ### Added

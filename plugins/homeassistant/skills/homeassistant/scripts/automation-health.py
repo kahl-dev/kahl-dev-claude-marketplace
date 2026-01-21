@@ -395,9 +395,7 @@ def main(
             formatted = format_health_report(report, check_entities)
             click.echo(formatted)
 
-        # Exit with error code if issues found
-        if report["issues_found"] > 0:
-            sys.exit(1)
+        # Diagnostic tools exit 0 on successful run (finding issues is expected behavior)
         sys.exit(0)
 
     except Exception as error:
