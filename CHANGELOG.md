@@ -23,6 +23,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `automation-health.py`: Exit 0 on successful run (finding issues is expected behavior, not failure)
 
+## homeassistant [2.0.0] - 2026-01-26
+
+### Added
+
+- **25 new scripts** (26 → 51 total), organized by category:
+  - **Entity** (3 new): `search-entities.py`, `get-history.py`, `call-service.py`
+  - **Automation** (4 new): `toggle-automation.py`, `list-scenes.py`, `activate-scene.py`, `list-scripts.py`, `run-script.py`
+  - **Registry** (11 new): `list-labels.py`, `manage-labels.py`, `list-devices.py`, `update-device.py`, `list-areas.py`, `manage-areas.py`, `list-floors.py`, `manage-floors.py`, `list-categories.py`, `manage-categories.py`, `update-entity.py`
+  - **Helpers** (4 new): `manage-helpers.py`, `manage-persons.py`, `manage-zones.py`, `manage-tags.py`
+  - **Dashboard** (2 new): `save-dashboard.py`, `delete-dashboard.py`
+  - **Backups** (2 new): `list-backups.py`, `manage-backups.py`
+  - **Templates** (2 new): `render-template.py`, `fire-event.py`
+  - **Integrations** (4 new): `update-core-config.py`, `list-integrations.py`, `manage-integrations.py`, `manage-users.py`
+- SKILL.md: Enhanced YAML description with capability taxonomy (10 categories)
+- SKILL.md: Safety & Permissions section (read-only vs write vs destructive)
+- SKILL.md: API compatibility notes (REST vs WebSocket vs HassOS-only)
+- SKILL.md: Scripts capability table with categorized counts
+
+### Changed
+
+- All destructive operations now require `--confirm` flag
+- Bulk operations (update-device.py) use continue-all pattern with `--fail-fast` opt-in
+
+### Technical
+
+- WebSocket API: registry, helpers, users, templates (undocumented, verified HA 2026.1.2)
+- REST API: dashboards, backups (HassOS/Supervised only for backups)
+- Exception handling: specific exceptions (`json.JSONDecodeError`, `KeyError`) over bare `except`
+
 ## homeassistant [1.1.0] - 2026-01-21
 
 ### Added

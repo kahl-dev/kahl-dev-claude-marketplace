@@ -273,7 +273,7 @@ uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/check-reload.py
 uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/deploy-config.py --dry-run
 ```
 
-### ⚠️ CRITICAL: Protected Files (NEVER overwritten)
+### ⚠️ Protected Files (NEVER overwritten)
 
 | Path | Reason |
 |------|--------|

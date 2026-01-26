@@ -139,7 +139,7 @@ def restore(
         try:
             error_detail = error.response.json()
             error_msg = error_detail.get("message", error_msg)
-        except Exception:
+        except (json.JSONDecodeError, KeyError):
             pass
         if output_json:
             click.echo(json.dumps({"error": error_msg}, indent=2))
@@ -211,7 +211,7 @@ def delete(
         try:
             error_detail = error.response.json()
             error_msg = error_detail.get("message", error_msg)
-        except Exception:
+        except (json.JSONDecodeError, KeyError):
             pass
         if output_json:
             click.echo(json.dumps({"error": error_msg}, indent=2))
