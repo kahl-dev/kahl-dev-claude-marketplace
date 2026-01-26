@@ -1,11 +1,27 @@
 ---
 name: homeassistant
 description: |
-  [Claude Code ONLY] Home Assistant control via scripts in ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/.
-  Auto-triggers on: homeassistant, hass, light, switch, sensor, automation, scene, toggle, turn on/off, dashboard, deploy config, validate config, backup, system log, repairs, health check, diagnostics.
-  Read SKILL.md guide to know which script for your task. Use --help for syntax (don't read script sources).
-  Scripts provide entity control, automations, scenes, scripts, dashboards, history, AND config file deployment.
-  Requires env vars: HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN, HA_SSH_HOST (for deploy). Always use absolute paths.
+  [Claude Code ONLY] Home Assistant control via 51 scripts in ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/.
+
+  **Capabilities (by category):**
+  - ENTITY: list, get-state, search, toggle, call-service, history (6 scripts)
+  - AUTOMATION: list, toggle, trigger, create (4 scripts)
+  - SCENE/SCRIPT: list-scenes, activate-scene, list-scripts, run-script (4 scripts)
+  - DASHBOARD: list, get, save, delete (4 scripts)
+  - REGISTRY: labels, devices, areas, floors, categories, entities (11 scripts)
+  - HELPERS: input_boolean, input_number, timers, counters, persons, zones, tags (4 scripts)
+  - CONFIG: init, validate, deploy, check-reload, trigger-backup, list/manage-backups (7 scripts)
+  - DIAGNOSTICS: system-log, repairs, check-config, automation-health (4 scripts)
+  - TEMPLATES: render-template, fire-event (2 scripts)
+  - INTEGRATIONS: list, reload/disable/enable/remove, manage-users, update-core-config (5 scripts)
+
+  **Auto-triggers on:** homeassistant, hass, light, switch, sensor, automation, scene, toggle, turn on/off, dashboard, deploy config, validate config, backup, system log, repairs, health check, diagnostics, template, event, integration, user, label, area, floor, device, helper, zone, category.
+
+  **Usage:** Read SKILL.md for script selection → Use --help for syntax (don't read script sources).
+
+  **Destructive operations require --confirm:** delete-dashboard, manage-backups delete/restore, manage-labels delete, manage-areas delete, manage-floors delete, manage-categories delete, manage-integrations remove, manage-users delete, manage-helpers delete.
+
+  **Env vars:** HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN (required); HA_SSH_HOST (for deploy only).
 model: haiku
 ---
 
@@ -275,21 +291,19 @@ These are excluded from rsync to protect your installation.
 
 All scripts: `${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/`
 
-- 6 entity operations
-- 4 automation operations
-- 2 scene operations
-- 2 script operations
-- 2 dashboard operations
-- 1 system operation
-- 5 config operations
-- 4 diagnostic operations
-- 11 registry operations
-- 4 helper & entity operations
-- 2 template & event operations
-- 4 integration & user operations
-- 2 additional dashboard operations
-- 2 backup management operations
-- **Total: 51 scripts**
+| Category | Count | Scripts |
+|----------|-------|---------|
+| Entity | 6 | list-entities, get-state, search-entities, toggle, call-service, get-history |
+| Automation | 4 | list-automations, toggle-automation, trigger-automation, create-automation |
+| Scene/Script | 4 | list-scenes, activate-scene, list-scripts, run-script |
+| Dashboard | 4 | list-dashboards, get-dashboard, save-dashboard, delete-dashboard |
+| Registry | 11 | list/manage-labels, list-devices, update-device, list/manage-areas, list/manage-floors, list/manage-categories, update-entity |
+| Helpers | 4 | manage-helpers, manage-persons, manage-zones, manage-tags |
+| Config | 7 | get-config, init-config, validate-config, deploy-config, trigger-backup, list-backups, manage-backups |
+| Diagnostics | 4 | get-system-log, list-repairs, check-config, automation-health |
+| Templates | 2 | render-template, fire-event |
+| Integrations | 5 | update-core-config, list-integrations, manage-integrations, manage-users, check-reload |
+| **Total** | **51** | |
 
 ## Dual Output Pattern
 
@@ -310,6 +324,50 @@ Following **Beyond MCP** pattern:
 - Self-contained scripts (~150-300 lines each)
 - Bearer token authentication
 - No external state
+
+## Safety & Permissions
+
+### Read-Only Operations (Safe)
+All `list-*.py`, `get-*.py`, `search-*.py`, `check-*.py` scripts are read-only.
+
+### Write Operations (Require Care)
+| Operation | Confirmation | Risk Level |
+|-----------|--------------|------------|
+| `toggle.py`, `call-service.py` | None | Low (reversible) |
+| `activate-scene.py`, `run-script.py` | None | Low (executes HA scripts) |
+| `trigger-automation.py` | None | Medium (runs automation) |
+| `create-automation.py` | None | Medium (creates config) |
+| `save-dashboard.py` | None | Medium (overwrites dashboard) |
+| `fire-event.py` | None | Medium (triggers automations) |
+| `update-*.py` | None | Medium (modifies metadata) |
+| `manage-*.py create/update` | None | Medium (creates/modifies) |
+| `deploy-config.py` | --dry-run available | High (deploys to HA) |
+| `update-core-config.py` | None | High (changes HA settings) |
+
+### Destructive Operations (Require --confirm)
+| Script | What It Does |
+|--------|--------------|
+| `delete-dashboard.py` | Permanently deletes dashboard |
+| `manage-backups.py delete` | Permanently deletes backup |
+| `manage-backups.py restore` | Restarts HA, overwrites config |
+| `manage-labels.py delete` | Removes label from all entities |
+| `manage-areas.py delete` | Removes area assignments |
+| `manage-floors.py delete` | Removes floor assignments |
+| `manage-categories.py delete` | Removes category assignments |
+| `manage-integrations.py remove` | Removes integration config |
+| `manage-users.py delete` | Deletes user account |
+| `manage-helpers.py delete` | Deletes helper entity |
+| `manage-persons.py delete` | Deletes person entity |
+| `manage-zones.py delete` | Deletes zone |
+| `manage-tags.py delete` | Deletes NFC/QR tag |
+
+### API Compatibility
+| API Type | Scripts | Notes |
+|----------|---------|-------|
+| REST API | Most scripts | Works on all HA installations |
+| WebSocket API | system-log, repairs, registry, helpers, users, templates | Undocumented, verified HA 2026.1.2 |
+| Backup REST API | list-backups, manage-backups, trigger-backup | HassOS/Supervised only |
+| Dashboard API | save/delete-dashboard | Storage-mode dashboards only |
 
 ## Context Savings
 
