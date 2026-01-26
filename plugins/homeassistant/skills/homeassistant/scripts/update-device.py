@@ -160,12 +160,12 @@ def format_results(results: dict[str, Any]) -> str:
 @click.option(
     "--device-id",
     type=str,
-    help="Single device ID to update",
+    help="Single device ID to update (get from list-devices.py --json)",
 )
 @click.option(
     "--device-ids",
     type=str,
-    help="Comma-separated device IDs for bulk update",
+    help="Comma-separated device IDs for bulk update (get IDs from list-devices.py)",
 )
 @click.option(
     "--from-json",

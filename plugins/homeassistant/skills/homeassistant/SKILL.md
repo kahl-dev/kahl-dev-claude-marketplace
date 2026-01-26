@@ -105,8 +105,16 @@ export HA_STAGING_PATH="/homeassistant/config_staging"  # Default
 | Script | Use When | Example |
 |--------|----------|---------|
 | `list-labels.py` | View all labels | `--search "thread"` |
+| `manage-labels.py` | Create/update/delete labels | `create --name "Thread" --color red` |
 | `list-devices.py` | View all devices | `--label thread --area living_room` |
 | `update-device.py` | Update device labels/area | `--device-id abc --labels thread,heizung` |
+| `list-areas.py` | View all areas | `--floor ground_floor` |
+| `manage-areas.py` | Create/update/delete areas | `create --name "Living Room" --floor ground` |
+| `list-floors.py` | View all floors | `--search "ground"` |
+| `manage-floors.py` | Create/update/delete floors | `create --name "Ground" --level 0` |
+| `list-categories.py` | View categories by scope | `--scope automation` |
+| `manage-categories.py` | Create/update/delete categories | `create --scope automation --name "Climate"` |
+| `update-entity.py` | Update entity metadata | `--entity-id light.x --area living_room` |
 
 **Bulk operations:**
 ```bash
@@ -115,6 +123,18 @@ uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/update-device.py --dev
 
 # Update from JSON file
 uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/update-device.py --from-json device-updates.json
+```
+
+**CRUD operations (manage-* scripts):**
+```bash
+# Create
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-labels.py create --name "Thread" --color blue --icon mdi:network
+
+# Update
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-labels.py update --label-id thread --color red
+
+# Delete (requires --confirm)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-labels.py delete --label-id thread --confirm
 ```
 
 ### Diagnostic Operations
@@ -181,8 +201,8 @@ All scripts: `${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/`
 - 1 system operation
 - 5 config operations
 - 4 diagnostic operations
-- 3 registry operations
-- **Total: 29 scripts**
+- 11 registry operations
+- **Total: 37 scripts**
 
 ## Dual Output Pattern
 
