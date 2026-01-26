@@ -137,6 +137,29 @@ uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-labels.py updat
 uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-labels.py delete --label-id thread --confirm
 ```
 
+### Helper & Entity Operations
+
+| Script | Use When | Example |
+|--------|----------|---------|
+| `manage-helpers.py` | CRUD for all helper types | `list --type input_boolean` |
+| `manage-persons.py` | CRUD for persons | `list`, `create --name "John"` |
+| `manage-zones.py` | CRUD for zones | `create --name "Office" --latitude 52.5 --longitude 13.4` |
+| `manage-tags.py` | CRUD for NFC/QR tags | `list`, `create --name "Front Door"` |
+
+**Helper types:** input_boolean, input_number, input_text, input_select, input_datetime, input_button, counter, timer, schedule, todo, date, time
+
+**Helper examples:**
+```bash
+# List input_boolean helpers
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-helpers.py list --type input_boolean
+
+# Create input_number
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-helpers.py create --type input_number --name "Target Temp" --min 15 --max 30 --unit "°C"
+
+# Delete (requires --confirm)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-helpers.py delete --type input_number --id target_temp --confirm
+```
+
 ### Diagnostic Operations
 
 | Script | Use When | Example |
@@ -146,7 +169,7 @@ uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-labels.py delet
 | `check-config.py` | Validate HA configuration | (no args) |
 | `automation-health.py` | Find automation issues | `--check-entities --stale-days 30` |
 
-**Note:** `get-system-log.py`, `list-repairs.py`, and registry scripts use WebSocket API (undocumented, verified on HA 2026.1.2).
+**Note:** `get-system-log.py`, `list-repairs.py`, registry, and helper scripts use WebSocket API (undocumented, verified on HA 2026.1.2).
 
 ## Config Deployment Workflow
 
@@ -202,7 +225,8 @@ All scripts: `${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/`
 - 5 config operations
 - 4 diagnostic operations
 - 11 registry operations
-- **Total: 37 scripts**
+- 4 helper & entity operations
+- **Total: 41 scripts**
 
 ## Dual Output Pattern
 
