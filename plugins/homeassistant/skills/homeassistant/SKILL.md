@@ -100,6 +100,23 @@ export HA_STAGING_PATH="/homeassistant/config_staging"  # Default
 | `trigger-backup.py` | Create HA backup | `--no-wait` |
 | `check-reload.py` | Verify HA health | `--wait 10` |
 
+### Registry Operations
+
+| Script | Use When | Example |
+|--------|----------|---------|
+| `list-labels.py` | View all labels | `--search "thread"` |
+| `list-devices.py` | View all devices | `--label thread --area living_room` |
+| `update-device.py` | Update device labels/area | `--device-id abc --labels thread,heizung` |
+
+**Bulk operations:**
+```bash
+# Update multiple devices with same labels
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/update-device.py --device-ids abc,def,ghi --labels thread,batterie
+
+# Update from JSON file
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/update-device.py --from-json device-updates.json
+```
+
 ### Diagnostic Operations
 
 | Script | Use When | Example |
@@ -109,7 +126,7 @@ export HA_STAGING_PATH="/homeassistant/config_staging"  # Default
 | `check-config.py` | Validate HA configuration | (no args) |
 | `automation-health.py` | Find automation issues | `--check-entities --stale-days 30` |
 
-**Note:** `get-system-log.py` and `list-repairs.py` use WebSocket API (undocumented, verified on HA 2026.1.2).
+**Note:** `get-system-log.py`, `list-repairs.py`, and registry scripts use WebSocket API (undocumented, verified on HA 2026.1.2).
 
 ## Config Deployment Workflow
 
@@ -164,7 +181,8 @@ All scripts: `${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/`
 - 1 system operation
 - 5 config operations
 - 4 diagnostic operations
-- **Total: 26 scripts**
+- 3 registry operations
+- **Total: 29 scripts**
 
 ## Dual Output Pattern
 
