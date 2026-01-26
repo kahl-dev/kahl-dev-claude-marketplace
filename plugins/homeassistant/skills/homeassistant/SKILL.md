@@ -88,6 +88,8 @@ export HA_STAGING_PATH="/homeassistant/config_staging"  # Default
 |--------|----------|---------|
 | `list-dashboards.py` | View dashboards | (no args) |
 | `get-dashboard.py` | Dashboard config | `lovelace --view 0` |
+| `save-dashboard.py` | Save dashboard config | `lovelace --file dashboard.json` |
+| `delete-dashboard.py` | Delete dashboard (--confirm) | `my-dashboard --confirm` |
 
 ### System & Config Operations
 
@@ -98,6 +100,8 @@ export HA_STAGING_PATH="/homeassistant/config_staging"  # Default
 | `validate-config.py` | Check YAML, push to staging | `--skip-push` for local only |
 | `deploy-config.py` | **Deploy** config to HA | `--dry-run` to preview |
 | `trigger-backup.py` | Create HA backup | `--no-wait` |
+| `list-backups.py` | List all backups | (no args) |
+| `manage-backups.py` | Restore/delete backups | `restore --backup-id abc --confirm` |
 | `check-reload.py` | Verify HA health | `--wait 10` |
 
 ### Registry Operations
@@ -283,7 +287,9 @@ All scripts: `${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/`
 - 4 helper & entity operations
 - 2 template & event operations
 - 4 integration & user operations
-- **Total: 47 scripts**
+- 2 additional dashboard operations
+- 2 backup management operations
+- **Total: 51 scripts**
 
 ## Dual Output Pattern
 
