@@ -171,6 +171,61 @@ uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-helpers.py dele
 
 **Note:** `get-system-log.py`, `list-repairs.py`, registry, and helper scripts use WebSocket API (undocumented, verified on HA 2026.1.2).
 
+### Templates & Events
+
+| Script | Use When | Example |
+|--------|----------|---------|
+| `render-template.py` | Render Jinja2 templates | `"{{ states('sensor.temp') }}"` |
+| `fire-event.py` | Fire custom events | `my_event --data '{"key": "value"}'` |
+
+**Template examples:**
+```bash
+# Simple state
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/render-template.py "{{ states('sun.sun') }}"
+
+# Count entities
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/render-template.py "{{ states.light | list | count }} lights"
+
+# From file
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/render-template.py --file template.j2
+```
+
+### Integration & User Management
+
+| Script | Use When | Example |
+|--------|----------|---------|
+| `update-core-config.py` | Update HA core settings | `--location-name "Home" --time-zone Europe/Berlin` |
+| `list-integrations.py` | List config entries | `--domain zha --state loaded` |
+| `manage-integrations.py` | Reload/disable/enable/remove | `reload --entry-id abc123` |
+| `manage-users.py` | List/create/delete users | `list --exclude-system` |
+
+**Integration examples:**
+```bash
+# List all integrations
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/list-integrations.py
+
+# Reload specific integration
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-integrations.py reload --entry-id abc123
+
+# Remove integration (requires --confirm)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-integrations.py remove --entry-id abc123 --confirm
+```
+
+**User examples:**
+```bash
+# List users (excluding system accounts)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-users.py list --exclude-system
+
+# Create user (credentials set via HA UI after)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-users.py create --name "Guest"
+
+# Create admin user
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-users.py create --name "Admin" --admin
+
+# Delete user (requires --confirm)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-users.py delete --user-id abc123 --confirm
+```
+
 ## Config Deployment Workflow
 
 **Edit → Validate → Deploy → Verify**
@@ -226,7 +281,9 @@ All scripts: `${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/`
 - 4 diagnostic operations
 - 11 registry operations
 - 4 helper & entity operations
-- **Total: 41 scripts**
+- 2 template & event operations
+- 4 integration & user operations
+- **Total: 47 scripts**
 
 ## Dual Output Pattern
 
