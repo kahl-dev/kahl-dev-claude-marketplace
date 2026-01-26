@@ -19,7 +19,7 @@ description: |
 
   **Usage:** Read SKILL.md for script selection → Use --help for syntax (don't read script sources).
 
-  **Destructive operations require --confirm:** delete-dashboard, manage-backups delete/restore, manage-labels delete, manage-areas delete, manage-floors delete, manage-categories delete, manage-integrations remove, manage-users delete, manage-helpers delete.
+  **Destructive operations require --confirm:** delete-dashboard, manage-backups delete/restore, manage-labels delete, manage-areas delete, manage-floors delete, manage-categories delete, manage-integrations remove, manage-users delete, manage-helpers delete, manage-persons delete, manage-zones delete, manage-tags delete.
 
   **Env vars:** HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN (required); HA_SSH_HOST (for deploy only).
 model: haiku

@@ -40,17 +40,24 @@ def get_required_env(name: str, help_text: str = "") -> str:
     return value
 
 
-# Configuration from environment
-HA_URL = get_required_env(
-    "HOMEASSISTANT_URL",
-    "Your HA instance URL, e.g., http://homeassistant.local:8123",
-)
-HA_TOKEN = get_required_env(
-    "HOMEASSISTANT_TOKEN",
-    "Get from: HA → Profile → Security → Long-Lived Access Tokens",
-)
+# Configuration from environment (validated at runtime for --help support)
+HA_URL: str = ""
+HA_TOKEN: str = ""
 API_TIMEOUT = 30.0
 USER_AGENT = "HomeAssistant-CLI/1.0"
+
+
+def _validate_config() -> None:
+    """Validate required environment variables."""
+    global HA_URL, HA_TOKEN
+    HA_URL = get_required_env(
+        "HOMEASSISTANT_URL",
+        "Your HA instance URL, e.g., http://homeassistant.local:8123",
+    )
+    HA_TOKEN = get_required_env(
+        "HOMEASSISTANT_TOKEN",
+        "Get from: HA → Profile → Security → Long-Lived Access Tokens",
+    )
 
 
 class HomeAssistantClient:
@@ -197,6 +204,7 @@ def main(url_path: str, view: int | None, output_json: bool) -> None:
 
         uv run get-dashboard.py custom-dashboard --json
     """
+    _validate_config()
     try:
         with HomeAssistantClient() as client:
             config = client.get_dashboard(url_path)

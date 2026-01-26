@@ -44,16 +44,24 @@ def get_required_env(name: str, help_text: str = "") -> str:
     return value
 
 
-# Configuration from environment
-HA_URL = get_required_env(
-    "HOMEASSISTANT_URL",
-    "Your HA instance URL, e.g., http://homeassistant.local:8123",
-)
-HA_TOKEN = get_required_env(
-    "HOMEASSISTANT_TOKEN",
-    "Get from: HA → Profile → Security → Long-Lived Access Tokens",
-)
+# Configuration from environment (validated at runtime for --help support)
+HA_URL: str = ""
+HA_TOKEN: str = ""
 WS_TIMEOUT = 30
+
+
+def _validate_config() -> None:
+    """Validate required environment variables."""
+    global HA_URL, HA_TOKEN
+    HA_URL = get_required_env(
+        "HOMEASSISTANT_URL",
+        "Your HA instance URL, e.g., http://homeassistant.local:8123",
+    )
+    HA_TOKEN = get_required_env(
+        "HOMEASSISTANT_TOKEN",
+        "Get from: HA → Profile → Security → Long-Lived Access Tokens",
+    )
+
 
 HELPER_TYPES = [
     "input_boolean",
@@ -193,6 +201,7 @@ def cli() -> None:
 @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
 def list_helpers(helper_type: str, output_json: bool) -> None:
     """List all helpers of a specific type."""
+    _validate_config()
     try:
         result = websocket_command(f"{helper_type}/list")
         helpers = result if isinstance(result, list) else []

@@ -40,17 +40,24 @@ def get_required_env(name: str, help_text: str = "") -> str:
     return value
 
 
-# Configuration from environment
-HA_URL = get_required_env(
-    "HOMEASSISTANT_URL",
-    "Your HA instance URL, e.g., http://homeassistant.local:8123",
-)
-HA_TOKEN = get_required_env(
-    "HOMEASSISTANT_TOKEN",
-    "Get from: HA → Profile → Security → Long-Lived Access Tokens",
-)
+# Configuration from environment (validated at runtime for --help support)
+HA_URL: str = ""
+HA_TOKEN: str = ""
 API_TIMEOUT = 120.0  # Backups can take a while
 USER_AGENT = "HomeAssistant-CLI/1.0"
+
+
+def _validate_config() -> None:
+    """Validate required environment variables."""
+    global HA_URL, HA_TOKEN
+    HA_URL = get_required_env(
+        "HOMEASSISTANT_URL",
+        "Your HA instance URL, e.g., http://homeassistant.local:8123",
+    )
+    HA_TOKEN = get_required_env(
+        "HOMEASSISTANT_TOKEN",
+        "Get from: HA → Profile → Security → Long-Lived Access Tokens",
+    )
 
 
 class HomeAssistantClient:
@@ -209,6 +216,7 @@ def main(
 
         uv run trigger-backup.py --json
     """
+    _validate_config()
     try:
         with HomeAssistantClient() as client:
             # Get list of backups before triggering

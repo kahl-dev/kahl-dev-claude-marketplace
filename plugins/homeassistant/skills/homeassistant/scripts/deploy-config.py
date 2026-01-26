@@ -92,21 +92,29 @@ def get_required_env(name: str, help_text: str = "") -> str:
     return value
 
 
-# Configuration from environment
-HA_URL = get_required_env(
-    "HOMEASSISTANT_URL",
-    "Your HA instance URL, e.g., http://homeassistant.local:8123",
-)
-HA_TOKEN = get_required_env(
-    "HOMEASSISTANT_TOKEN",
-    "Get from: HA → Profile → Security → Long-Lived Access Tokens",
-)
+# Configuration from environment (validated at runtime for --help support)
+HA_URL: str = ""
+HA_TOKEN: str = ""
 HA_STAGING_PATH = os.getenv("HA_STAGING_PATH", "/homeassistant/config_staging")
 HA_CONFIG_PATH = os.getenv("HA_CONFIG_PATH", "/homeassistant")
 DEFAULT_LOCAL_PATH = os.path.expanduser(os.getenv("HA_LOCAL_CONFIG", "~/ha-config"))
 
 API_TIMEOUT = 120.0
 USER_AGENT = "HomeAssistant-CLI/1.0"
+
+
+def _validate_config() -> None:
+    """Validate required environment variables."""
+    global HA_URL, HA_TOKEN
+    HA_URL = get_required_env(
+        "HOMEASSISTANT_URL",
+        "Your HA instance URL, e.g., http://homeassistant.local:8123",
+    )
+    HA_TOKEN = get_required_env(
+        "HOMEASSISTANT_TOKEN",
+        "Get from: HA → Profile → Security → Long-Lived Access Tokens",
+    )
+
 
 # CRITICAL: Files/directories to NEVER overwrite
 # These contain device registries, Zigbee/Z-Wave networks, auth, etc.
@@ -473,6 +481,7 @@ def main(
 
         uv run deploy-config.py --json
     """
+    _validate_config()
     # Fail fast if HA_SSH_HOST not set
     ssh_host = get_required_env(
         "HA_SSH_HOST",
