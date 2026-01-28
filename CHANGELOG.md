@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **homeassistant**: `delete-entity.py` - Remove entities from registry
+- **homeassistant**: `get-logbook.py` - Query logbook entries with filtering
+- **homeassistant**: `list-traces.py`, `get-trace.py` - Automation trace debugging
+- **homeassistant**: SKILL.md debugging section with trace/logbook workflows
 - Makefile with LIA conventions (ASCII art, ##N help system, color output)
 - Version bump script (`scripts/bump-version.sh`)
 - Enhanced ruff config: `C4` rule, per-file ignores for UV scripts (`E402`, `E501`)
