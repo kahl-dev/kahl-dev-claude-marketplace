@@ -1,7 +1,7 @@
 ---
 name: homeassistant
 description: |
-  [Claude Code ONLY] Home Assistant control via 51 scripts in ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/.
+  [Claude Code ONLY] Home Assistant control via 55 scripts in ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/.
 
   **Capabilities (by category):**
   - ENTITY: list, get-state, search, toggle, call-service, history (6 scripts)
@@ -12,14 +12,15 @@ description: |
   - HELPERS: input_boolean, input_number, timers, counters, persons, zones, tags (4 scripts)
   - CONFIG: init, validate, deploy, check-reload, trigger-backup, list/manage-backups (7 scripts)
   - DIAGNOSTICS: system-log, repairs, check-config, automation-health (4 scripts)
+  - DEBUGGING: get-trace, list-traces, get-logbook, delete-entity (4 scripts)
   - TEMPLATES: render-template, fire-event (2 scripts)
   - INTEGRATIONS: list, reload/disable/enable/remove, manage-users, update-core-config (5 scripts)
 
-  **Auto-triggers on:** homeassistant, hass, light, switch, sensor, automation, scene, toggle, turn on/off, dashboard, deploy config, validate config, backup, system log, repairs, health check, diagnostics, template, event, integration, user, label, area, floor, device, helper, zone, category.
+  **Auto-triggers on:** homeassistant, hass, light, switch, sensor, automation, scene, toggle, turn on/off, dashboard, deploy config, validate config, backup, system log, repairs, health check, diagnostics, template, event, integration, user, label, area, floor, device, helper, zone, category, trace, logbook, debug, orphaned entity.
 
   **Usage:** Read SKILL.md for script selection → Use --help for syntax (don't read script sources).
 
-  **Destructive operations require --confirm:** delete-dashboard, manage-backups delete/restore, manage-labels delete, manage-areas delete, manage-floors delete, manage-categories delete, manage-integrations remove, manage-users delete, manage-helpers delete, manage-persons delete, manage-zones delete, manage-tags delete.
+  **Destructive operations require --confirm:** delete-dashboard, manage-backups delete/restore, manage-labels delete, manage-areas delete, manage-floors delete, manage-categories delete, manage-integrations remove, manage-users delete, manage-helpers delete, manage-persons delete, manage-zones delete, manage-tags delete, delete-entity.
 
   **Env vars:** HOMEASSISTANT_URL, HOMEASSISTANT_TOKEN (required); HA_SSH_HOST (for deploy only).
 model: haiku
@@ -191,6 +192,36 @@ uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/manage-helpers.py dele
 
 **Note:** `get-system-log.py`, `list-repairs.py`, registry, and helper scripts use WebSocket API (undocumented, verified on HA 2026.1.2).
 
+### Debugging Operations
+
+| Script | Use When | Example |
+|--------|----------|---------|
+| `list-traces.py` | List automation execution traces | `automation.my_automation` or `--domain automation` |
+| `get-trace.py` | View specific trace details | `automation.my_automation` or `--run-id abc123` |
+| `get-logbook.py` | Query logbook entries | `--hours 24 --entity automation.test` |
+| `delete-entity.py` | Delete orphaned entities | `sensor.orphaned --confirm` |
+
+**Debugging workflow:**
+```bash
+# 1. Find what happened (list recent traces)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/list-traces.py --domain automation
+
+# 2. View trace details (smart formatted, shows executed path)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/get-trace.py automation.my_automation
+
+# 3. With verbose output (all variable values)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/get-trace.py automation.my_automation --verbose
+
+# 4. Query logbook for related events
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/get-logbook.py --entity automation.my_automation --hours 24
+
+# 5. Clean up orphaned entity (dry-run first)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/delete-entity.py automation.old_test
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/delete-entity.py automation.old_test --confirm
+```
+
+**Tip:** HA stores only 5 traces per automation by default. Add `trace: stored_traces: 20` to automation YAML for better debugging history.
+
 ### Templates & Events
 
 | Script | Use When | Example |
@@ -301,9 +332,10 @@ All scripts: `${CLAUDE_PLUGIN_ROOT}/skills/homeassistant/scripts/`
 | Helpers | 4 | manage-helpers, manage-persons, manage-zones, manage-tags |
 | Config | 7 | get-config, init-config, validate-config, deploy-config, trigger-backup, list-backups, manage-backups |
 | Diagnostics | 4 | get-system-log, list-repairs, check-config, automation-health |
+| Debugging | 4 | list-traces, get-trace, get-logbook, delete-entity |
 | Templates | 2 | render-template, fire-event |
 | Integrations | 5 | update-core-config, list-integrations, manage-integrations, manage-users, check-reload |
-| **Total** | **51** | |
+| **Total** | **55** | |
 
 ## Dual Output Pattern
 
