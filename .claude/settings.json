@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.py ]]; then uv run ruff check --fix \"$CLAUDE_FILE_PATH\" 2>&1 && uv run ruff format \"$CLAUDE_FILE_PATH\" 2>&1; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_FILE_PATH\" == *.json ]]; then python3 -c \"import json,sys; json.load(open(sys.argv[1]))\" \"$CLAUDE_FILE_PATH\" 2>&1 || { echo \"❌ Invalid JSON: $CLAUDE_FILE_PATH\" >&2; exit 1; }; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
