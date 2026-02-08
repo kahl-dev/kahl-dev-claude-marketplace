@@ -6,17 +6,20 @@ Claude Code plugin marketplace using the **Beyond MCP** pattern - self-contained
 
 ```
 .claude-plugin/marketplace.json    # Marketplace definition
+CHANGELOG.md                       # Keep a Changelog format
 plugins/
 └── <plugin-name>/
     ├── .claude-plugin/plugin.json # Plugin manifest (version here)
     ├── skills/<skill>/
     │   ├── SKILL.md               # Progressive disclosure guide
     │   └── scripts/               # Python scripts
+    ├── examples/                  # Example configs (.env.example)
     └── docs/                      # User documentation
 scripts/
 └── bump-version.sh                # Version automation
 docs/
-└── contributing.md                # Contribution guide
+├── contributing.md                # Contribution guide
+└── beyond-mcp.md                 # Pattern documentation
 ```
 
 ## Path References (CRITICAL)
@@ -105,8 +108,8 @@ def get_required_env(name: str, help_text: str = "") -> str:
     return value
 
 # Usage with help_text
-HA_TOKEN = get_required_env(
-    "HA_TOKEN",
+HOMEASSISTANT_TOKEN = get_required_env(
+    "HOMEASSISTANT_TOKEN",
     "Get from: HA → Profile → Security → Long-Lived Access Tokens"
 )
 ```
@@ -165,14 +168,21 @@ git commit --no-verify -m "message"
 1. Create structure:
    ```
    plugins/<name>/
+   ├── .claude-plugin/plugin.json
    ├── skills/<skill>/
    │   ├── SKILL.md
    │   └── scripts/
+   ├── examples/.env.example
    ├── docs/
    └── README.md
    ```
 
-2. Add to `marketplace.json`:
+2. Create `plugins/<name>/.claude-plugin/plugin.json`:
+   ```json
+   {"name": "plugin-name", "version": "1.0.0", "description": "..."}
+   ```
+
+3. Add to `marketplace.json`:
    ```json
    {
      "name": "plugin-name",
@@ -183,7 +193,8 @@ git commit --no-verify -m "message"
    }
    ```
 
-3. Update root README.md plugin table
+4. Update root README.md plugin table
+5. Add entry to CHANGELOG.md under `[Unreleased]`
 
 ## Security
 
@@ -204,5 +215,6 @@ git commit --no-verify -m "message"
 1. `make setup` (first time)
 2. Make changes with conventional commits
 3. Update CHANGELOG.md under `[Unreleased]`
-4. `make bump PLUGIN=<name> TYPE=<type>`
-5. Push to main
+4. `make check` (verify quality)
+5. `make bump PLUGIN=<name> TYPE=<type>`
+6. Push to main
