@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **homeassistant**: SKILL.md refactored for progressive disclosure (~800 → ~400 tokens frontmatter)
+- **homeassistant**: Verbose examples, architecture details, and debugging workflows moved to `references/`
+
+### Added
+
+- **homeassistant**: `references/examples.md` — detailed examples for all script categories
+- **homeassistant**: `references/architecture.md` — API compatibility matrix, script inventory, Beyond MCP pattern
+
+## homeassistant [2.2.0] - 2026-02-12
+
 ### Added
 
 - **homeassistant**: `delete-entity.py` - Remove entities from registry
